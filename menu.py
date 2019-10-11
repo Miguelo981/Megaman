@@ -12,9 +12,10 @@ def init_game_settings():
     os.environ['SDL_VIDEO_CENTERED'] = '1'
 
     # Game Resolution
-    screen_width = 800
-    screen_height = 600
+    screen_width = 1000
+    screen_height = 700
     screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_icon(pygame.image.load("images/favicon.ico"))
 
     # Text Renderer
     def text_format(message, textFont, textSize, textColor):
@@ -37,7 +38,7 @@ def init_game_settings():
 
     # Game Framerate
     clock = pygame.time.Clock()
-    FPS = 30
+    FPS = 60
 
 def start_window():
     global pantalla
@@ -73,16 +74,19 @@ def main_menu():
                         quit()
 
         # Main Menu UI
-        screen.fill(blue)
-        title = text_format("Sourcecodester", font, 90, yellow)
+        #import GIFImage
+        #img = GIFImage(r'C:\Users\alu2018240\Pictures\30b8174c6f1a07e0af9bcf41fec3a5f5.gif')
+        image = pygame.image.load('images/Megaman-background.png')
+        screen.fill('images/Megaman-background.png')
+        title = text_format("MEGAMAN", font, 75, yellow)
         if selected == "start":
-            text_start = text_format("START", font, 75, white)
+            text_start = text_format("START", font, 50, white)
         else:
-            text_start = text_format("START", font, 75, black)
+            text_start = text_format("START", font, 50, black)
         if selected == "quit":
-            text_quit = text_format("QUIT", font, 75, white)
+            text_quit = text_format("QUIT", font, 50, white)
         else:
-            text_quit = text_format("QUIT", font, 75, black)
+            text_quit = text_format("QUIT", font, 50, black)
 
         title_rect = title.get_rect()
         start_rect = text_start.get_rect()
@@ -91,10 +95,10 @@ def main_menu():
         # Main Menu Text
         screen.blit(title, (screen_width / 2 - (title_rect[2] / 2), 80))
         screen.blit(text_start, (screen_width / 2 - (start_rect[2] / 2), 300))
-        screen.blit(text_quit, (screen_width / 2 - (quit_rect[2] / 2), 360))
+        screen.blit(text_quit, (screen_width / 2 - (quit_rect[2] / 2), 400))
         pygame.display.update()
         clock.tick(FPS)
-        pygame.display.set_caption("Python - Pygame Simple Main Menu Selection")
+        pygame.display.set_caption("MEGAMAN EXE")
 
 
 def start_menu():
@@ -112,4 +116,3 @@ def get_pantalla():
 
 init_game_settings()
 main_menu()
-start_menu()
