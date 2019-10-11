@@ -3,7 +3,6 @@ import pygame as _pygame
 import pygame.gfxdraw as _gfxdraw
 import types
 
-from pygameMenu.sound import Sound as _Sound
 import pygameMenu.config as _cfg
 import pygameMenu.controls as _ctrl
 import pygameMenu.events as _events
@@ -52,79 +51,7 @@ class Menu(object):
                  title_offsety=0,
                  widget_alignment=_locals.ALIGN_CENTER
                  ):
-        """
-        Menu constructor.
-        :param surface: Pygame surface
-        :type surface: pygame.surface.SurfaceType
-        :param window_width: Window width size (px)
-        :type window_width: int
-        :param window_height: Window height size (px)
-        :type window_height: int
-        :param font: Font file path
-        :type font: basestring
-        :param title: Title of the menu (main title)
-        :type title: basestring
-        :param back_box: Draw a back-box button on header
-        :type back_box: bool
-        :param bgfun: Background drawing function (only if menu pause app)
-        :type bgfun: function
-        :param color_selected: Color of selected item
-        :type color_selected: tuple
-        :param dopause: Pause game
-        :type dopause: bool
-        :param draw_region_x: Drawing position of element inside menu (x-axis)
-        :type draw_region_x: int
-        :param draw_region_y: Drawing position of element inside menu (y-axis)
-        :type draw_region_y: int
-        :param draw_select: Draw a rectangle around selected item (bool)
-        :type draw_select: bool
-        :param enabled: Menu is enabled by default or not
-        :type enabled: bool
-        :param fps: FPS of the menu
-        :type fps: int, float
-        :param font_color: Color of font
-        :type font_color: tuple
-        :param font_size: Font size
-        :type font_size: int
-        :param font_size_title: Font size of the title
-        :type font_size_title: int
-        :param font_title: Alternative font of the title (file path)
-        :type font_title: basestring
-        :param joystick_enabled: Enable/disable joystick on menu
-        :type joystick_enabled: bool
-        :param menu_alpha: Alpha of background (0=transparent, 100=opaque)
-        :type menu_alpha: int
-        :param menu_color: Menu color
-        :type menu_color: tuple
-        :param menu_color_title: Background color of title
-        :type menu_color_title: tuple
-        :param menu_height: Height of menu (px)
-        :type menu_height: int
-        :param menu_width: Width of menu (px)
-        :type menu_width: int
-        :param mouse_enabled: Enable/disable mouse click on menu
-        :type mouse_enabled: bool
-        :param mouse_visible: Set mouse visible on menu
-        :type mouse_visible: bool
-        :param onclose: Function applied when closing the menu
-        :type onclose: function, NoneType
-        :param option_margin: Margin of each element in menu (px)
-        :type option_margin: int
-        :param option_shadow: Indicate if a shadow is drawn on each option
-        :type option_shadow: bool
-        :param option_shadow_offset: Offset of shadow
-        :type option_shadow_offset: int
-        :param option_shadow_position: Position of shadow
-        :type option_shadow_position: basestring
-        :param rect_width: Border with of rectangle around selected item
-        :type rect_width: int
-        :param title_offsetx: Offset x-position of title (px)
-        :type title_offsetx: int
-        :param title_offsety: Offset y-position of title (px)
-        :type title_offsety: int
-        :param widget_alignment: Default widget alignment
-        :type widget_alignment: basestring
-        """
+
         assert isinstance(window_width, int)
         assert isinstance(window_height, int)
         assert isinstance(font, str)
