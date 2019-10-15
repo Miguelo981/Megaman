@@ -4,7 +4,7 @@ import os
 
 
 def init_game_settings():
-    global screen, text_format, white, black, gray, red, green, blue, yellow, font, screen_width, clock, FPS
+    global screen, text_format, white, black, gray, red, green, blue, yellow, gold, dark, font, screen_width, clock, FPS
     # Game Initialization
     pygame.init()
 
@@ -32,6 +32,8 @@ def init_game_settings():
     green = (0, 255, 0)
     blue = (0, 0, 255)
     yellow = (255, 255, 0)
+    gold = (249, 166, 2)
+    dark = (7, 7, 23)
 
     # Game Fonts
     font = "fonts/Mega-Man-Battle-Network.ttf"
@@ -56,6 +58,13 @@ def main_menu():
     menu = True
     selected = "start"
 
+    file = 'music/main_theme.mp3'
+    pygame.init()
+    pygame.mixer.init()
+    pygame.mixer.music.load(file)
+    pygame.mixer.music.play()
+    pygame.event.wait()
+
     while menu:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -72,34 +81,30 @@ def main_menu():
                     if selected == "quit":
                         pygame.quit()
                         quit()
-
         # Main Menu UI
-        #import GIFImage
-        #img = GIFImage(r'C:\Users\alu2018240\Pictures\30b8174c6f1a07e0af9bcf41fec3a5f5.gif')
-        image = pygame.image.load('images/Megaman-background.png')
-        screen.fill('images/Megaman-background.png')
-        title = text_format("MEGAMAN", font, 75, yellow)
+        filename = 'images/Megaman-background.png'
+        image = pygame.image.load(filename)
+        screen.blit(image, (0,0))
+        pygame.display.update()
+
         if selected == "start":
             text_start = text_format("START", font, 50, white)
         else:
-            text_start = text_format("START", font, 50, black)
+            text_start = text_format("START", font, 50, dark)
         if selected == "quit":
             text_quit = text_format("QUIT", font, 50, white)
         else:
-            text_quit = text_format("QUIT", font, 50, black)
+            text_quit = text_format("QUIT", font, 50, dark)
 
-        title_rect = title.get_rect()
         start_rect = text_start.get_rect()
         quit_rect = text_quit.get_rect()
 
         # Main Menu Text
-        screen.blit(title, (screen_width / 2 - (title_rect[2] / 2), 80))
-        screen.blit(text_start, (screen_width / 2 - (start_rect[2] / 2), 300))
-        screen.blit(text_quit, (screen_width / 2 - (quit_rect[2] / 2), 400))
+        screen.blit(text_start, (screen_width / 1.5 - (start_rect[2] / 2), 300))
+        screen.blit(text_quit, (screen_width / 1.5 - (quit_rect[2] / 2), 400))
         pygame.display.update()
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
-
 
 def start_menu():
     start_window()
