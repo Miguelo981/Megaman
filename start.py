@@ -1,6 +1,11 @@
 import pygame, sys
 from pygame.locals import *
 
+while 1:
+    import menu
+    menu.init_game_settings()
+    menu.main_menu()
+
 pygame.init()
 screen = pygame.display.set_mode((400,400),0,32)
 myFont = pygame.font.SysFont('arial', 14)

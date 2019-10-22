@@ -108,4 +108,6 @@ def main_menu():
         pygame.display.set_caption("MEGAMAN EXE")
 
 def get_screen():
-    return pygame.display.set_mode((screen_width, screen_height))
+    return screen#pygame.display.set_mode((screen_width, screen_height))
+def get_clock():
+    return clock
