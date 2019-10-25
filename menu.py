@@ -1,21 +1,21 @@
 import time
 import pygame
 import os
+from Game_Screen import Game_Screen
 
 
 def init_game_settings():
-    global screen, text_format, white, black, gray, red, green, blue, yellow, gold, dark, font, screen_width, screen_height, clock, FPS
+    global screen, screen_object, text_format, white, black, gray, red, green, blue, yellow, gold, dark, font, screen_width, screen_height, clock, FPS
     # Game Initialization
     pygame.init()
 
+    screen_object = Game_Screen(700, 1000)
+    screen = pygame.display.set_mode((screen_object.get_screen_width(), screen_object.get_screen_height()))
+
     # Center the Game Application
     os.environ['SDL_VIDEO_CENTERED'] = '1'
-
-    # Game Resolution
-    screen_width = 1000
-    screen_height = 700
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_icon(pygame.image.load("images/favicon.ico"))
+    #screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_icon(pygame.image.load("images/megaman_exe_navi.png"))
 
     # Text Renderer
     def text_format(message, textFont, textSize, textColor):
@@ -41,6 +41,8 @@ def init_game_settings():
     # Game Framerate
     clock = pygame.time.Clock()
     FPS = 60
+
+#TODO MIRAR ARKANOID Y HACER DIALOGOS!!
 
 def main_menu():
     menu = True
@@ -100,14 +102,15 @@ def main_menu():
         quit_rect = text_quit.get_rect()
 
         # Main Menu Text
-        screen.blit(text_start, (screen_width / 1.5 - (start_rect[2] / 2), 300))
-        screen.blit(text_controls, (screen_width / 1.5 - (controls_rect[2] / 2), 400))
-        screen.blit(text_quit, (screen_width / 1.5 - (quit_rect[2] / 2), 500))
+        screen.blit(text_start, (screen_object.get_screen_width() / 1.5 - (start_rect[2] / 2), 300))
+        screen.blit(text_controls, (screen_object.get_screen_width() / 1.5 - (controls_rect[2] / 2), 400))
+        screen.blit(text_quit, (screen_object.get_screen_width() / 1.5 - (quit_rect[2] / 2), 500))
         pygame.display.update()
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
 
 def get_screen():
     return screen#pygame.display.set_mode((screen_width, screen_height))
-def get_clock():
-    return clock
+
+def get_screen_object():
+    return get_screen_object()
