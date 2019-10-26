@@ -1,21 +1,21 @@
 import time
 import pygame
 import os
+from Game_Screen import Game_Screen
 
 
 def init_game_settings():
-    global screen, text_format, white, black, gray, red, green, blue, yellow, gold, dark, font, screen_width, clock, FPS
+    global screen, screen_object, text_format, white, black, gray, red, green, blue, yellow, gold, dark, font, screen_width, screen_height, clock, FPS
     # Game Initialization
     pygame.init()
 
+    screen_object = Game_Screen(700, 1000)
+    screen = pygame.display.set_mode((screen_object.get_screen_width(), screen_object.get_screen_height()))
+
     # Center the Game Application
     os.environ['SDL_VIDEO_CENTERED'] = '1'
-
-    # Game Resolution
-    screen_width = 1000
-    screen_height = 700
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    pygame.display.set_icon(pygame.image.load("images/favicon.ico"))
+    #screen = pygame.display.set_mode((screen_width, screen_height))
+    pygame.display.set_icon(pygame.image.load("images/megaman_exe_navi.png"))
 
     # Text Renderer
     def text_format(message, textFont, textSize, textColor):
@@ -42,17 +42,7 @@ def init_game_settings():
     clock = pygame.time.Clock()
     FPS = 60
 
-def start_window():
-    global pantalla
-    width = 800
-    higth = 600
-    color_negro_fondo = (0, 0, 0)
-    color_blanco = (255, 255, 255)
-    pygame.init()
-
-    pantalla = pygame.display.set_mode((width, higth))
-    pygame.display.set_caption("Megaman")
-
+#TODO MIRAR ARKANOID Y HACER DIALOGOS!!
 
 def main_menu():
     menu = True
@@ -71,13 +61,20 @@ def main_menu():
                 pygame.quit()
                 quit()
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
+                if selected == "controls" and event.key == pygame.K_UP:
                     selected = "start"
-                elif event.key == pygame.K_DOWN:
+                elif selected == "quit" and event.key == pygame.K_UP:
+                    selected = "controls"
+                if selected == "start" and event.key == pygame.K_DOWN:
+                    selected = "controls"
+                elif selected == "controls" and event.key == pygame.K_DOWN:
                     selected = "quit"
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         print("Start")
+                    if selected == "controls":
+                        import Stage
+                        stage = Stage
                     if selected == "quit":
                         pygame.quit()
                         quit()
@@ -91,33 +88,29 @@ def main_menu():
             text_start = text_format("START", font, 50, white)
         else:
             text_start = text_format("START", font, 50, dark)
+        if selected == "controls":
+            text_controls = text_format("CONTROLS", font, 50, white)
+        else:
+            text_controls = text_format("CONTROLS", font, 50, dark)
         if selected == "quit":
             text_quit = text_format("QUIT", font, 50, white)
         else:
             text_quit = text_format("QUIT", font, 50, dark)
 
         start_rect = text_start.get_rect()
+        controls_rect = text_controls.get_rect()
         quit_rect = text_quit.get_rect()
 
         # Main Menu Text
-        screen.blit(text_start, (screen_width / 1.5 - (start_rect[2] / 2), 300))
-        screen.blit(text_quit, (screen_width / 1.5 - (quit_rect[2] / 2), 400))
+        screen.blit(text_start, (screen_object.get_screen_width() / 1.5 - (start_rect[2] / 2), 300))
+        screen.blit(text_controls, (screen_object.get_screen_width() / 1.5 - (controls_rect[2] / 2), 400))
+        screen.blit(text_quit, (screen_object.get_screen_width() / 1.5 - (quit_rect[2] / 2), 500))
         pygame.display.update()
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
 
-def start_menu():
-    start_window()
-    # reloj para medir la velocidad
-    reloj = pygame.time.Clock()
-    # ajustamos la repetición de la tecla pulsada
-    pygame.key.set_repeat(30)
-    puntuacion = 0  # agregamos la puntuacion
-    vidas = 3  # agregamos vidas al jugador
+def get_screen():
+    return screen#pygame.display.set_mode((screen_width, screen_height))
 
-
-def get_pantalla():
-    return pantalla
-
-init_game_settings()
-main_menu()
+def get_screen_object():
+    return get_screen_object()
