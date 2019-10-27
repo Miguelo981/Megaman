@@ -2,6 +2,8 @@ import time
 import pygame
 import os
 from Game_Screen import Game_Screen
+from Player import Player
+import sys
 
 
 def init_game_settings():
@@ -72,17 +74,28 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         print("Start")
-                    if selected == "controls":
+                        pygame.mixer.music.stop()
                         import Stage
-                        stage = Stage
+                    if selected == "controls":
+                        print("Controls")
+                        #stage = Stage()
                     if selected == "quit":
                         pygame.quit()
                         quit()
+            if event.type == pygame.QUIT:
+                sys.exit()
+            # añadimos el evento del teclado
+            #elif event.type == pygame.KEYDOWN:
+                #megaman.update(event)
+
         # Main Menu UI
         filename = 'images/Megaman-background.png'
+        #filename = screen.fill((255,255,255))
         image = pygame.image.load(filename)
         screen.blit(image, (0,0))
-        pygame.display.update()
+
+        #megaman = Player()
+        #screen.blit(megaman.img, megaman.rect)
 
         if selected == "start":
             text_start = text_format("START", font, 50, white)
@@ -105,12 +118,17 @@ def main_menu():
         screen.blit(text_start, (screen_object.get_screen_width() / 1.5 - (start_rect[2] / 2), 300))
         screen.blit(text_controls, (screen_object.get_screen_width() / 1.5 - (controls_rect[2] / 2), 400))
         screen.blit(text_quit, (screen_object.get_screen_width() / 1.5 - (quit_rect[2] / 2), 500))
-        pygame.display.update()
+
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
+        pygame.display.flip()
+        pygame.display.update()
 
 def get_screen():
     return screen#pygame.display.set_mode((screen_width, screen_height))
 
 def get_screen_object():
-    return get_screen_object()
+    return screen_object
+
+def get_clock():
+    return clock.tick(FPS)
