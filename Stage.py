@@ -46,14 +46,41 @@ def main():
 
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
-    plataforma1 = Platform(0, get_screen_object().get_screen_height(), get_screen_object().get_screen_width(), 40)
+    plataforma1 = Platform(0, 425, 500, 700)
     all_sprites.add(plataforma1)
     platforms.add(plataforma1)
 
+    pygame.key.set_repeat(30)
+
+    jumpCount = 10
+    isJump = False
 
     while 1:
-
+        vel = 5
+        fall = 0
         for event in pygame.event.get():
+
+            if not (isJump) and event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP and megaman.speed[1] > vel:
+
+                    megaman.speed[1] -= vel
+
+                if event.type == pygame.K_DOWN and megaman.speed[1] < 500 - get_screen_object().get_screen_height() - vel:
+                    megaman.speed[1] += vel
+
+                if event.type == pygame.K_SPACE:
+                    isJump = True
+            else:
+                if jumpCount >= -10:
+                    megaman.speed[1] -= (jumpCount * abs(jumpCount)) * 0.5
+                    jumpCount -= 1
+                else:
+                    jumpCount = 10
+                    isJump = False
+
+            if not pygame.sprite.collide_rect(megaman, plataforma1):
+                megaman.speed = [0, fall]
+                fall -= 1
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()

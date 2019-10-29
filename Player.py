@@ -31,11 +31,15 @@ class Player(pygame.sprite.Sprite):
         elif evento.key == pygame.K_RIGHT and self.rect.right < menu.screen_object.get_screen_width(): #añadimos que no pase del borde izquierdo
             #print("Me estoy moviendo a la derecha")
             self.speed = [10, 0]
+        elif evento.key == pygame.K_BACKSPACE:
+            self.speed = [0, 10]
         else:
             #print("Me me muevo")
             self.speed = [0, 0]
         #Mover en base a posición actual y velocidad
         self.rect.move_ip(self.speed)
+
+        pygame.display.update()
 
     def makeSprite(filename, frames=1):
         thisSprite = newSprite(filename, frames)
