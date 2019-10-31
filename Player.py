@@ -3,7 +3,6 @@ import sys
 import menu
 import os  # new code below
 
-
 class Player(pygame.sprite.Sprite):
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
