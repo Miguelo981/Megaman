@@ -3,6 +3,7 @@ from menu import get_screen
 from menu import get_screen_object
 from menu import get_clock
 from Player import Player
+from Enemy import Enemy
 import sys
 
 class Platform(pygame.sprite.Sprite):
@@ -46,14 +47,44 @@ def main():
 
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
-    plataforma1 = Platform(0, get_screen_object().get_screen_height(), get_screen_object().get_screen_width(), 40)
+    plataforma1 = Platform(0, 425, 500, 700)
     all_sprites.add(plataforma1)
     platforms.add(plataforma1)
 
+    pygame.key.set_repeat(30)
+
+    jumpCount = 10
+    isJump = False
 
     while 1:
-
+        vel = 25
+        fall = 0.005
+        while not pygame.sprite.collide_rect(megaman, plataforma1): #TODO SE PETA SI NO ENCUENTRA SUELO NUNCA
+            if not isJump:
+                megaman.rect.y -= fall
+                fall -= 0.005
+        if not pygame.sprite.collide_rect(megaman, plataforma1):
+            megaman.rect.y -= fall
+            fall -= 5
         for event in pygame.event.get():
+            if not (isJump) and event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP: #and megaman.speed[1] > vel:
+                    megaman.speed[1] = vel
+
+                #if event.type == pygame.K_DOWN and megaman.speed[1] < 500 - get_screen_object().get_screen_height() - vel:
+                    #megaman.speed[1] += vel
+                    megaman.rect.y -= vel
+
+                if event.type == pygame.K_SPACE:
+                    megaman.rect.y -= vel
+                    isJump = True
+            else:
+                if jumpCount >= -10:
+                    megaman.speed[1] -= (jumpCount * abs(jumpCount)) * 0.5
+                    jumpCount -= 1
+                else:
+                    jumpCount = 10
+                    isJump = False
             if event.type == pygame.QUIT:
                 pygame.quit()
                 quit()
@@ -61,6 +92,7 @@ def main():
             # añadimos el evento del teclado
             elif event.type == pygame.KEYDOWN:
                 megaman.update(event)
+                omega.update(event)
 
         # Main Menu UI
         #filename = 'images/Megaman-background.png'
@@ -110,6 +142,7 @@ def main():
 
 stage = Stage()
 megaman = Player()
+omega = Enemy()
 main()
 
 def get_cosa():
