@@ -2,7 +2,7 @@ import pygame
 from menu import get_screen
 from menu import get_screen_object
 from menu import get_clock
-from Player import Player
+from Player import *
 from Enemy import Enemy
 import sys
 
@@ -47,7 +47,7 @@ def main():
 
     all_sprites = pygame.sprite.Group()
     platforms = pygame.sprite.Group()
-    plataforma1 = Platform(0, 425, 500, 700)
+    plataforma1 = Platform(0, 425, 700, 700)
     all_sprites.add(plataforma1)
     platforms.add(plataforma1)
 
@@ -57,42 +57,54 @@ def main():
     isJump = False
 
     while 1:
-        vel = 25
-        fall = 0.005
-        while not pygame.sprite.collide_rect(megaman, plataforma1): #TODO SE PETA SI NO ENCUENTRA SUELO NUNCA
-            if not isJump:
+        if megaman.vel.y > 0:
+            hits = pygame.sprite.spritecollide(megaman, plataforma1, False)
+            if hits:
+                megaman.pos.y = hits[0].rect.top
+                megaman.vel.y = 0
+
+            megaman.rect.x += 1
+            hits = pygame.sprite.spritecollide(megaman, plataforma1, False)
+            megaman.rect.x -= 1
+            if hits:
+                megaman.vel.y = -20
+        if (50-10 == 50):
+            vel = 25
+            fall = 0.005
+            while not pygame.sprite.collide_rect(megaman, plataforma1): #TODO SE PETA SI NO ENCUENTRA SUELO NUNCA
+                if not isJump:
+                    megaman.rect.y -= fall
+                    fall -= 0.005
+            if not pygame.sprite.collide_rect(megaman, plataforma1):
                 megaman.rect.y -= fall
-                fall -= 0.005
-        if not pygame.sprite.collide_rect(megaman, plataforma1):
-            megaman.rect.y -= fall
-            fall -= 5
-        for event in pygame.event.get():
-            if not (isJump) and event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP: #and megaman.speed[1] > vel:
-                    megaman.speed[1] = vel
+                fall -= 5
+            for event in pygame.event.get():
+                if not (isJump) and event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_UP: #and megaman.speed[1] > vel:
+                        megaman.speed[1] = vel
 
-                #if event.type == pygame.K_DOWN and megaman.speed[1] < 500 - get_screen_object().get_screen_height() - vel:
-                    #megaman.speed[1] += vel
-                    megaman.rect.y -= vel
+                    #if event.type == pygame.K_DOWN and megaman.speed[1] < 500 - get_screen_object().get_screen_height() - vel:
+                        #megaman.speed[1] += vel
+                        megaman.rect.y -= vel
 
-                if event.type == pygame.K_SPACE:
-                    megaman.rect.y -= vel
-                    isJump = True
-            else:
-                if jumpCount >= -10:
-                    megaman.speed[1] -= (jumpCount * abs(jumpCount)) * 0.5
-                    jumpCount -= 1
+                    if event.type == pygame.K_SPACE:
+                        megaman.rect.y -= vel
+                        isJump = True
                 else:
-                    jumpCount = 10
-                    isJump = False
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-                #sys.exit()
-            # añadimos el evento del teclado
-            elif event.type == pygame.KEYDOWN:
-                megaman.update(event)
-                omega.update(event)
+                    if jumpCount >= -10:
+                        megaman.speed[1] -= (jumpCount * abs(jumpCount)) * 0.5
+                        jumpCount -= 1
+                    else:
+                        jumpCount = 10
+                        isJump = False
+                if event.type == pygame.QUIT:
+                    pygame.quit()
+                    quit()
+                    #sys.exit()
+                # añadimos el evento del teclado
+                elif event.type == pygame.KEYDOWN:
+                    megaman.update(event)
+                    omega.update(event)
 
         # Main Menu UI
         #filename = 'images/Megaman-background.png'
@@ -141,7 +153,7 @@ def main():
     pygame.display.set_caption("MEGAMAN EXE: STAGE 1")
 
 stage = Stage()
-megaman = Player()
+megaman = Playe()
 omega = Enemy()
 main()
 
