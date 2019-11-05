@@ -8,13 +8,15 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.game = game
         self.image = pg.Surface((30, 40))
-        self.image = pg.image.load(r'C:\Users\Miguelo\Documents\Megaman\images/MM_WS.png')
+        self.image = pg.image.load('images/MM_WS.png')
         #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
+        self.dashing = False
+        self.timer = 0
 
     def jump(self):
         # jump only if standing on a platform
@@ -22,7 +24,10 @@ class Player(pg.sprite.Sprite):
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 1
         if hits:
-            self.vel.y = -20
+            self.vel.y = -15
+
+    def dash(self):
+        self.pos.x +=10
 
     def update(self):
         self.acc = vec(0, PLAYER_GRAV)
@@ -31,6 +36,18 @@ class Player(pg.sprite.Sprite):
             self.acc.x = -PLAYER_ACC
         if keys[pg.K_RIGHT]:
             self.acc.x = PLAYER_ACC
+        #TODO CONTROL DEL DASH
+        if keys[pg.K_a] and keys[pg.K_LEFT]:
+            if not self.dashing:
+                self.acc.x = -PLAYER_ACC
+                self.pos.x -= 10
+                #self.dash()
+        if keys[pg.K_a] and keys[pg.K_RIGHT]:
+            if not self.dashing:
+                self.acc.x = PLAYER_ACC
+                self.pos.x += 10
+
+            #self.dash()
 
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
@@ -39,9 +56,9 @@ class Player(pg.sprite.Sprite):
         self.pos += self.vel + 0.5 * self.acc
         # wrap around the sides of the screen
         if self.pos.x > WIDTH:
-            self.pos.x = 0
-        if self.pos.x < 0:
             self.pos.x = WIDTH
+        if self.pos.x < 0:
+            self.pos.x = 0
 
         self.rect.midbottom = self.pos
 

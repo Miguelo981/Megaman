@@ -43,6 +43,9 @@ class Game:
             if hits:
                 self.player.pos.y = hits[0].rect.top
                 self.player.vel.y = 0
+                #print(self.player.pos.y)
+        if self.player.pos.y > HEIGHT:
+            self.player.kill()
 
     def events(self):
         # Game Loop - events
