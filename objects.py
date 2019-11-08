@@ -17,6 +17,11 @@ class Player(pg.sprite.Sprite):
         self.acc = vec(0, 0)
         self.dashing = False
         self.timer = 0
+        #self.last = pygame.time.get_ticks()
+        self.clock = self.game.clock
+        self.cooldown = 125
+        self.counter = 0
+        self.time = clock.tick()
 
     def jump(self):
         # jump only if standing on a platform
@@ -26,8 +31,10 @@ class Player(pg.sprite.Sprite):
         if hits:
             self.vel.y = -15
 
-    def dash(self):
-        self.pos.x +=10
+    def set_clock(self):
+        self.time = self.clock.tick()
+        self.counter += self.time
+        #print(self.counter)
 
     def update(self):
         self.acc = vec(0, PLAYER_GRAV)
@@ -38,16 +45,25 @@ class Player(pg.sprite.Sprite):
             self.acc.x = PLAYER_ACC
         #TODO CONTROL DEL DASH
         if keys[pg.K_a] and keys[pg.K_LEFT]:
-            if not self.dashing:
-                self.acc.x = -PLAYER_ACC
-                self.pos.x -= 10
-                #self.dash()
-        if keys[pg.K_a] and keys[pg.K_RIGHT]:
-            if not self.dashing:
-                self.acc.x = PLAYER_ACC
-                self.pos.x += 10
+            if self.counter > self.cooldown:
+                for i in range(1,5):
+                    self.vel.x -= 0.75
+                    hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                    if hits:
+                        self.vel.x -= 0.75
+                    #self.acc.x = -PLAYER_ACC
+                    #self.pos.x -= 1
+                self.counter = 0
+                #self.vel.x = 0
 
-            #self.dash()
+        if keys[pg.K_a] and keys[pg.K_RIGHT]:
+            if self.counter > self.cooldown:
+                for i in range(1, 5):
+                    self.vel.x += 1.5
+                    #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                    #if hits:
+                        #self.vel.x += 0.75
+                self.counter = 0
 
         # apply friction
         self.acc.x += self.vel.x * PLAYER_FRICTION
@@ -65,6 +81,8 @@ class Player(pg.sprite.Sprite):
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y, w, h):
         pg.sprite.Sprite.__init__(self)
+        self.h = h
+        self.w = w
         self.image = pg.Surface((w, h))
         self.image.fill(GREEN)
         self.rect = self.image.get_rect()

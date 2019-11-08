@@ -29,6 +29,7 @@ class Game:
         # Game Loop
         self.playing = True
         while self.playing:
+            self.player.set_clock()
             self.clock.tick(FPS)
             self.events()
             self.update()
@@ -41,6 +42,19 @@ class Game:
         if self.player.vel.y > 0:
             hits = pg.sprite.spritecollide(self.player, self.platforms, False)
             if hits:
+                for hit in hits:
+                    if self.player.pos.y == hit.rect.top:
+                        print("encima")
+                    if self.player.pos.y == hit.rect.bottom:
+                        self.player.pos.y = hit.rect.bottom
+                        print(self.player.pos.y)
+                        print(hit.rect.bottom)
+                if self.player.pos.y == hits[0].rect.top:
+                    print("encima")
+                if self.player.pos.y == hits[0].rect.bottom:
+                    print("hola")
+                    #self.player.pos.y = hits[0].rect.top - hits[0].h
+                    #self.player.vel.y = 0
                 self.player.pos.y = hits[0].rect.top
                 self.player.vel.y = 0
                 #print(self.player.pos.y)
