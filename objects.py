@@ -23,14 +23,18 @@ class Player(pg.sprite.Sprite):
         self.cooldown = 100
         self.counter = 0
         self.time = clock.tick()
+        self.collide = False
 
     def jump(self):
-        # jump only if standing on a platform
-        self.rect.x += 1
-        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-        self.rect.x -= 1
-        if hits:
-            self.vel.y = -15
+        if not self.collide:
+            # jump only if standing on a platform
+            self.rect.x += 1
+            hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+            self.rect.x -= 1
+            if hits:
+                self.vel.y = -15
+        else:
+            self.vel.y = 0
 
     def set_clock(self):
         self.time = self.clock.tick()
@@ -66,11 +70,12 @@ class Player(pg.sprite.Sprite):
                         #self.vel.x += 0.75
                 self.counter = 0
 
-        # apply friction
-        self.acc.x += self.vel.x * PLAYER_FRICTION
-        # equations of motion
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
+        if not self.collide:
+            # apply friction
+            self.acc.x += self.vel.x * PLAYER_FRICTION
+            # equations of motion
+            self.vel += self.acc
+            self.pos += self.vel + 0.5 * self.acc
         # wrap around the sides of the screen
         if self.pos.x > WIDTH:
             self.pos.x = WIDTH

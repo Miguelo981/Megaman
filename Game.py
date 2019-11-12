@@ -49,15 +49,23 @@ class Game:
                 elif self.player.rect.y <= hits[0].rect.y and not hits[0].main:
                     self.player.pos.y = hits[0].rect.top
                     self.player.vel.y = 0
-                    print("choquearri")
-                if self.player.rect.y >= hits[0].rect.y and not hits[0].main:
+                    #print("choquearri")
+                if (self.player.rect.top < hits[0].rect.y) and not hits[0].main: #or self.player.rect.top <= hits[0].rect.bottom
+                    self.player.rect.top = hits[0].rect.bottom +5
+                    #self.player.rect.y = hits[0].rect.bottom + 5
+                    self.player.collide = True
+                    print("coqueba")
+                print(self.player.collide)
+                '''if self.player.rect.y >= hits[0].rect.y and not hits[0].main:
                         self.player.pos.y = hits[0].rect.bottom #TODO CALCULAR DIFERENCIA
-                        print("coqueba")
+                        print("coqueba")'''
                 if self.player.rect.x <= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
-                    self.player.pos.x = hits[0].rect.x
+                    #self.player.pos.x = hits[0].rect.x
+                    self.player.pos.x = hits[0].rect.left
                     print("choqueiz")
                 if self.player.rect.x >= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
-                    self.player.pos.x = hits[0].rect.x + hits[0].w
+                    #self.player.pos.x = hits[0].rect.x + hits[0].w
+                    self.player.pos.x = hits[0].rect.right
                     print("choquede")
                 '''keys = pg.key.get_pressed()
                     if keys[pg.K_RIGHT]:
@@ -103,6 +111,7 @@ class Game:
                 #self.player.pos.y = hits[0].rect.top
                 #self.player.vel.y = 0
                 #print(self.player.pos.y)
+        self.player.collide = False
         if self.player.pos.y > HEIGHT:
             self.player.kill()
 
