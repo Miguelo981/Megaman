@@ -41,22 +41,67 @@ class Game:
         # check if player hits a platform - only if falling
         if self.player.vel.y > 0:
             hits = pg.sprite.spritecollide(self.player, self.platforms, False)
+            #hits = pg.sprite.collide_rect(self.player, self.platforms)
             if hits:
-                for hit in hits:
-                    if self.player.pos.y == hit.rect.top:
-                        print("encima")
-                    if self.player.pos.y == hit.rect.bottom:
-                        self.player.pos.y = hit.rect.bottom
-                        print(self.player.pos.y)
-                        print(hit.rect.bottom)
+                if hits[0].main:
+                    self.player.pos.y = hits[0].rect.top
+                    self.player.vel.y = 0
+                elif self.player.rect.y <= hits[0].rect.y and not hits[0].main:
+                    self.player.pos.y = hits[0].rect.top
+                    self.player.vel.y = 0
+                    print("choquearri")
+                if self.player.rect.y >= hits[0].rect.y and not hits[0].main:
+                        self.player.pos.y = hits[0].rect.bottom #TODO CALCULAR DIFERENCIA
+                        print("coqueba")
+                if self.player.rect.x <= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
+                    self.player.pos.x = hits[0].rect.x
+                    print("choqueiz")
+                if self.player.rect.x >= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
+                    self.player.pos.x = hits[0].rect.x + hits[0].w
+                    print("choquede")
+                '''keys = pg.key.get_pressed()
+                    if keys[pg.K_RIGHT]:
+                        self.player.pos.x -= 2
+                    elif keys[pg.K_LEFT]:
+                        self.player.pos.x += 2
+                if hits[0].rect.y == self.player.rect.y or self.player.pos.y <= hits[0].rect.y + hits[0].rect.h and not hits[0].main:
+                    #print(hits[0].rect.y)
+                    #print(hits[0].rect.h)
+                    #print(self.player.rect.y) #self.player.rect.y
+                    self.player.pos.y = hits[0].rect.y + hits[0].rect.h
+                    self.player.vel.y = 0
+                #if hits[0].rect.y <= self.player.rect.y <= hits[0].rect.y + hits[0].rect.h and not hits[0].main:
+                    #self.player.pos.y = hits[0].rect.h + hits[0].rect.y
+                    #self.player.vel.y = 0
+                    #print("sorpresa")
+
+                if self.player.pos.y == hits[0].rect.bottom:
+                    self.player.pos.y = hits[0].rect.bottom
+                    self.player.vel.y = 0
+                    print("debajo")
+                if self.player.pos.y == hits[0].rect.top:
+                    self.player.pos.y = hits[0].rect.top
+                    self.player.vel.y = 0
+            for hit in hits:
+                self.player.vel.y = 0  ##si pones eso en caida, arenas movedizas
+                print(hit)
+                if self.player.pos.y == hit.rect.top:
+                    print("encima")
+                    self.player.pos.y = hit.rect.top
+                    self.player.vel.y = 0
+                if self.player.pos.y == hit.rect.bottom:
+                    self.player.pos.y = hit.rect.bottom
+                    #print("estas encima")
+                    self.player.vel.y = 0
+                    print(hit.rect.bottom)
                 if self.player.pos.y == hits[0].rect.top:
                     print("encima")
                 if self.player.pos.y == hits[0].rect.bottom:
-                    print("hola")
+                    print("hola")'''
                     #self.player.pos.y = hits[0].rect.top - hits[0].h
                     #self.player.vel.y = 0
-                self.player.pos.y = hits[0].rect.top
-                self.player.vel.y = 0
+                #self.player.pos.y = hits[0].rect.top
+                #self.player.vel.y = 0
                 #print(self.player.pos.y)
         if self.player.pos.y > HEIGHT:
             self.player.kill()

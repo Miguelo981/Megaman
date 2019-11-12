@@ -7,7 +7,8 @@ class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
         self.game = game
-        self.image = pg.Surface((30, 40))
+        #self.image = pg.Surface((30, 40))
+        self.image = pg.Surface((14, 34))
         self.image = pg.image.load('images/MM_WS.png')
         #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
@@ -19,7 +20,7 @@ class Player(pg.sprite.Sprite):
         self.timer = 0
         #self.last = pygame.time.get_ticks()
         self.clock = self.game.clock
-        self.cooldown = 125
+        self.cooldown = 100
         self.counter = 0
         self.time = clock.tick()
 
@@ -79,7 +80,7 @@ class Player(pg.sprite.Sprite):
         self.rect.midbottom = self.pos
 
 class Platform(pg.sprite.Sprite):
-    def __init__(self, x, y, w, h):
+    def __init__(self, x, y, w, h, main):
         pg.sprite.Sprite.__init__(self)
         self.h = h
         self.w = w
@@ -88,3 +89,4 @@ class Platform(pg.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
+        self.main = main
