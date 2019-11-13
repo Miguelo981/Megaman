@@ -51,7 +51,9 @@ class Game:
                     self.player.vel.y = 0
                     #print("choquearri")
                 if (self.player.rect.top < hits[0].rect.y) and not hits[0].main: #or self.player.rect.top <= hits[0].rect.bottom
-                    self.player.rect.top = hits[0].rect.bottom +5
+                    #self.player.rect.top = hits[0].rect.y + self.player.rect.y
+                    #self.player.rect.top = hits[0].rect.bottom
+                    #self.player.rect.top = hits[0].rect.y + 5
                     #self.player.rect.y = hits[0].rect.bottom + 5
                     self.player.collide = True
                     print("coqueba")
@@ -62,10 +64,12 @@ class Game:
                 if self.player.rect.x <= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
                     #self.player.pos.x = hits[0].rect.x
                     self.player.pos.x = hits[0].rect.left
+                    self.player.vel.x = 0
                     print("choqueiz")
                 if self.player.rect.x >= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
                     #self.player.pos.x = hits[0].rect.x + hits[0].w
                     self.player.pos.x = hits[0].rect.right
+                    self.player.vel.x = 0
                     print("choquede")
                 '''keys = pg.key.get_pressed()
                     if keys[pg.K_RIGHT]:
@@ -82,7 +86,6 @@ class Game:
                     #self.player.pos.y = hits[0].rect.h + hits[0].rect.y
                     #self.player.vel.y = 0
                     #print("sorpresa")
-
                 if self.player.pos.y == hits[0].rect.bottom:
                     self.player.pos.y = hits[0].rect.bottom
                     self.player.vel.y = 0
@@ -113,7 +116,8 @@ class Game:
                 #print(self.player.pos.y)
         self.player.collide = False
         if self.player.pos.y > HEIGHT:
-            self.player.kill()
+            self.player.pos = vec(WIDTH / 2, HEIGHT / 2)
+            #self.player.kill()
 
     def events(self):
         # Game Loop - events
