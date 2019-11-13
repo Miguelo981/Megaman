@@ -1,91 +1,94 @@
-import pygame
-import sys
-import menu
-import os  # new code below
-vec = pygame.math.Vector2
+# Sprite classes for platform game
+import pygame as pg
+from Settings import *
+vec = pg.math.Vector2
 
-PLAYER_ACC = 0.5
-PLAYER_FRICTION = -0.12
-PLAYER_GRAV = 0.8
-
-class Playe(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        #self.game = game
-        self.image = pygame.Surface((30, 40))
-        self.img = pygame.image.load('images/omega.png')
+class Player(pg.sprite.Sprite):
+    def __init__(self, game):
+        pg.sprite.Sprite.__init__(self)
+        self.game = game
+        #self.image = pg.Surface((30, 40))
+        self.image = pg.Surface((14, 34))
+        self.image = pg.image.load('images/MM_WS.png')
         #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
-        self.rect.center = (menu.screen_object.get_screen_width() / 2, menu.screen_object.get_screen_height() / 2)
-        self.pos = vec(menu.screen_object.get_screen_width() / 2, menu.screen_object.get_screen_height() / 2)
+        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.pos = vec(WIDTH / 2, HEIGHT / 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
+        self.dashing = False
+        self.timer = 0
+        #self.last = pygame.time.get_ticks()
+        self.clock = self.game.clock
+        self.cooldown = 100
+        self.counter = 0
+        self.time = clock.tick()
+        self.collide = False
+
+    def jump(self):
+        # jump only if standing on a platform
+        self.rect.x += 1
+        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+        self.rect.x -= 1
+        if hits:
+            self.vel.y = -15
+
+    def set_clock(self):
+        self.time = self.clock.tick()
+        self.counter += self.time
+        #print(self.counter)
 
     def update(self):
         self.acc = vec(0, PLAYER_GRAV)
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_LEFT]:
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LEFT] and not self.collide:
             self.acc.x = -PLAYER_ACC
-        if keys[pygame.K_RIGHT]:
+        if keys[pg.K_RIGHT] and not self.collide:
             self.acc.x = PLAYER_ACC
+        #TODO CONTROL DEL DASH
+        if keys[pg.K_a] and keys[pg.K_LEFT]:
+            if self.counter > self.cooldown:
+                for i in range(1,5):
+                    self.vel.x -= 0.75
+                    hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                    if hits:
+                        self.vel.x -= 0.75
+                    #self.acc.x = -PLAYER_ACC
+                    #self.pos.x -= 1
+                self.counter = 0
+                #self.vel.x = 0
 
-        # apply friction
-        self.acc.x += self.vel.x * PLAYER_FRICTION
-        # equations of motion
-        self.vel += self.acc
-        self.pos += self.vel + 0.5 * self.acc
-        # wrap around the sides of the screen
-        if self.pos.x > menu.screen_object.get_screen_width():
-            self.pos.x = 0
+        if keys[pg.K_a] and keys[pg.K_RIGHT]:
+            if self.counter > self.cooldown:
+                for i in range(1, 5):
+                    self.vel.x += 1.5
+                    #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                    #if hits:
+                        #self.vel.x += 0.75
+                self.counter = 0
+
+        if not self.collide:
+            # apply friction
+            self.acc.x += self.vel.x * PLAYER_FRICTION
+            # equations of motion
+            self.vel += self.acc
+            self.pos += self.vel + 0.5 * self.acc
+            # wrap around the sides of the screen
+        if self.pos.x > WIDTH:
+            self.pos.x = WIDTH
         if self.pos.x < 0:
-            self.pos.x = menu.screen_object.get_screen_width()
+            self.pos.x = 0
 
         self.rect.midbottom = self.pos
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        pygame.sprite.Sprite.__init__(self)
-        self.images = []
-        self.img = pygame.image.load('images/omega.png')#.convert()
-        #self.images.append(self.img)
-        #self.image = self.images[0]
-        self.rect = self.img.get_rect() #image
-        self.rect.x = 250
-        self.rect.y = 250
-        #self.rect.midbottom = (menu.screen_object.get_screen_width() / 2, menu.screen_object.get_screen_height() / 2)
-        #self.rect.midbottom = (menu.screen_object.get_screen_width() / 2, menu.screen_object.get_screen_height() - 20)
-        self.speed = [15, 15]
-        #self.rect.centerx = menu.screen_object.get_screen_width() / 2
-        #self.rect.centery = menu.screen_object.get_screen_height() / 2
-
-    def draw(self):
-        pygame.draw.rect(menu.get_screen_object(), self.img, (self.x, self.y, 40, 40))
-
-    def update(self, evento):
-
-        #self.acc = speed[0, 0.5]
-        #buscar si se ha pulsado flecha izquierda
-        if evento.key == pygame.K_LEFT and self.rect.left > 0: #añadimos que no pase del borde derecho
-            #print("Me estoy moviendo a la izquierda")
-            self.speed = [-10, 0]
-            #TODO BOOLEAN RIGHT LEFT VIEW
-        #buscar si se ha pulsado flecha derecha
-        elif evento.key == pygame.K_RIGHT and self.rect.right < menu.screen_object.get_screen_width(): #añadimos que no pase del borde izquierdo
-            #print("Me estoy moviendo a la derecha")
-            self.speed = [10, 0]
-        elif evento.key == pygame.K_BACKSPACE:
-            self.speed = [0, 10]
-        else:
-            #print("Me me muevo")
-            self.speed = [0, 0]
-        #Mover en base a posición actual y velocidad
-        self.rect.move_ip(self.speed)
-
-        pygame.display.update()
-
-    #def makeSprite(filename, frames=1):
-     #   thisSprite = newSprite(filename, frames)
-      #  return thisSprite
-
-    def addSpriteImage(sprite, image):
-        sprite.addImage(image)
+class Platform(pg.sprite.Sprite):
+    def __init__(self, x, y, w, h, main):
+        pg.sprite.Sprite.__init__(self)
+        self.h = h
+        self.w = w
+        self.image = pg.Surface((w, h))
+        self.image.fill(GREEN)
+        self.rect = self.image.get_rect()
+        self.rect.x = x
+        self.rect.y = y
+        self.main = main
