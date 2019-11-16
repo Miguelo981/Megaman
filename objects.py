@@ -26,15 +26,12 @@ class Player(pg.sprite.Sprite):
         self.collide = False
 
     def jump(self):
-        if not self.collide:
-            # jump only if standing on a platform
-            self.rect.x += 1
-            hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-            self.rect.x -= 1
-            if hits:
-                self.vel.y = -15
-        else:
-            self.vel.y = 0
+        # jump only if standing on a platform
+        self.rect.x += 1
+        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+        self.rect.x -= 1
+        if hits:
+            self.vel.y = -15
 
     def set_clock(self):
         self.time = self.clock.tick()
@@ -44,9 +41,9 @@ class Player(pg.sprite.Sprite):
     def update(self):
         self.acc = vec(0, PLAYER_GRAV)
         keys = pg.key.get_pressed()
-        if keys[pg.K_LEFT]:
+        if keys[pg.K_LEFT] and not self.collide:
             self.acc.x = -PLAYER_ACC
-        if keys[pg.K_RIGHT]:
+        if keys[pg.K_RIGHT] and not self.collide:
             self.acc.x = PLAYER_ACC
         #TODO CONTROL DEL DASH
         if keys[pg.K_a] and keys[pg.K_LEFT]:
@@ -76,7 +73,7 @@ class Player(pg.sprite.Sprite):
             # equations of motion
             self.vel += self.acc
             self.pos += self.vel + 0.5 * self.acc
-        # wrap around the sides of the screen
+            # wrap around the sides of the screen
         if self.pos.x > WIDTH:
             self.pos.x = WIDTH
         if self.pos.x < 0:

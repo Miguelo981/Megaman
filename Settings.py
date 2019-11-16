@@ -7,8 +7,8 @@ def main_menu():
 
     pygame.init()
     song = 'music/main_theme.mp3'
-    music(song, True)
-    pygame.mixer.init()
+    #music(song, True)
+    #pygame.mixer.init()
 
     while menu:
         for event in pygame.event.get():
@@ -27,9 +27,9 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         print("Start")
-                        music(song, False)
+                        #######music(song, False)
                         #import Stage
-                        music('music/stage_1.mp3', True)
+                        ########music('music/stage_1.mp3', True)
                         import Game
                     if selected == "controls":
                         print("Controls")
@@ -109,13 +109,13 @@ FONT = "fonts/Mega-Man-Battle-Network.ttf"
 FPS = 60
 
 # Starting platforms
-PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH / 1.5, 40, True),
+PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH / 1.62, 40, False),
                  (WIDTH / 2 - 50, HEIGHT * 3 / 4, 100, 20, False),
                  (125, HEIGHT - 350, 100, 20, False),
                  (350, 200, 100, 20, False),
                  (175, 100, 50, 20, False),
                  (300, 500, 70, 50, False),
-                 (600, 600, 60, 120, False)]
+                 (610, 300, 120, 350, False)]
 
 # define colors
 WHITE = (255, 255, 255)
