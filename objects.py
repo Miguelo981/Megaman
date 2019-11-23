@@ -20,11 +20,12 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.game = game
         #self.image = pg.Surface((30, 40))
+        self.path = os.getcwd()
         self.image = pg.Surface((14, 34))
         self.path = os.getcwd()
         self.spawn_sprites = load_images(self.path + '\images\MM_spawn')
-        self.spawn()
-        self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
+        #self.spawn()
+        #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
         self.rect.center = (WIDTH / 2, HEIGHT / 2)
