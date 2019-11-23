@@ -65,11 +65,13 @@ class Game:
                     #self.player.pos.x = hits[0].rect.x
                     self.player.pos.x = hits[0].rect.left
                     self.player.vel.x = 0
+                    self.player.vel.y = 0
                     print("choqueiz")
                 if self.player.rect.x >= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
                     #self.player.pos.x = hits[0].rect.x + hits[0].w
                     self.player.pos.x = hits[0].rect.right
                     self.player.vel.x = 0
+                    self.player.vel.y = 0
                     print("choquede")
                 '''keys = pg.key.get_pressed()
                     if keys[pg.K_RIGHT]:

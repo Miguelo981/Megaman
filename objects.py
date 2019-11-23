@@ -21,6 +21,7 @@ class Player(pg.sprite.Sprite):
         self.game = game
         #self.image = pg.Surface((30, 40))
         self.image = pg.Surface((14, 34))
+        self.path = os.getcwd()
         self.spawn_sprites = load_images(self.path + '\images\MM_spawn')
         self.spawn()
         self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
@@ -43,7 +44,6 @@ class Player(pg.sprite.Sprite):
         self.count = 0
         self.time = clock.tick()
         self.collide = False
-        self.path = os.getcwd()
         self.move_right_sprites = load_images(self.path+'\images\MM_move_r')
         self.move_left_sprites = load_images(self.path+'\images\MM_move_l')
 
