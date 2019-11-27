@@ -21,9 +21,7 @@ class Player(pg.sprite.Sprite):
         self.game = game
         #self.image = pg.Surface((30, 40))
         self.path = os.getcwd()
-        self.image = pg.Surface((14, 34))
-        self.spawn_sprites = load_images(self.path + '\images\MM_spawn')
-        #self.spawn()
+        self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
         #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)
         self.rect = self.image.get_rect()
@@ -44,11 +42,14 @@ class Player(pg.sprite.Sprite):
         self.count = 0
         self.time = clock.tick()
         self.collide = False
+        self.spawn_sprites = load_images(self.path + '\images\MM_spawn')
         self.move_right_sprites = load_images(self.path+'\images\MM_move_r')
         self.move_left_sprites = load_images(self.path+'\images\MM_move_l')
 
     def spawn(self):
-        pass #TODO SPAWN ANIMATION
+            if self.animation_counter > self.animation_cooldown and self.count <= 11:
+                self.image = pg.image.load(self.spawn_sprites[self.count])
+                self.count += 1
 
     def jump(self):
         # jump only if standing on a platform
@@ -111,6 +112,7 @@ class Player(pg.sprite.Sprite):
                 #self.vel.x = 0
 
         if keys[pg.K_a] and keys[pg.K_RIGHT]:
+            self.image = pg.image.load(self.path + '\images\MM_WS_dash_1.png')
             self.moving = True
             if self.counter > self.cooldown:
                 for i in range(1, 5):
