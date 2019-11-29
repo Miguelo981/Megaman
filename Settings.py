@@ -96,8 +96,10 @@ def music(file, state):
 
 # game options/settings
 TITLE = "MEGAMAN"
-WIDTH = 1000
-HEIGHT = 700
+'''WIDTH = 1000
+HEIGHT = 700'''
+WIDTH = 600 #500,350
+HEIGHT = 400
 FPS = 60
 
 # Player properties
@@ -116,6 +118,23 @@ PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH / 1.62, 40, False),
                  (175, 100, 50, 20, False),
                  (300, 500, 70, 50, False),
                  (610, 300, 120, 350, False)]
+
+def load_map(path):
+    f = open(path + '.txt','r')
+    data = f.read()
+    f.close()
+    data = data.split('\n')
+    game_map = []
+    for row in data:
+        game_map.append(list(row))
+    return game_map
+
+game_map = load_map('map')
+
+grass_img = pygame.image.load('images/blocks/grass.png')
+dirt_img = pygame.image.load('images/blocks/dirt.png')
+background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
+true_scroll = [0,0]
 
 # define colors
 WHITE = (255, 255, 255)

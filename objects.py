@@ -23,8 +23,9 @@ class Player(pg.sprite.Sprite):
         self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
         #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)
-        self.rect = self.image.get_rect()
-        self.rect.center = (WIDTH / 2, HEIGHT / 2)
+        self.rect = pygame.Rect(100,100,15,34)
+        #self.rect = self.image.get_rect()
+        #self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
@@ -65,6 +66,7 @@ class Player(pg.sprite.Sprite):
         #print(self.counter)
 
     def update(self):
+        #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
         self.acc = vec(0, PLAYER_GRAV)
         keys = pg.key.get_pressed()
         if self.vel.x >= 0 and self.vel.x < 1.5 or self.vel.x > -1.5 and self.vel.x <= 0:
@@ -133,7 +135,7 @@ class Player(pg.sprite.Sprite):
         if self.pos.x < 0:
             self.pos.x = 0
 
-        self.rect.midbottom = self.pos
+        #self.rect.midbottom = self.pos
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, main):
