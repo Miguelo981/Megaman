@@ -36,6 +36,7 @@ class Game:
             self.draw()
 
     def update(self):
+        self.player.spawn()
         # Game Loop - Update
         self.all_sprites.update()
         # check if player hits a platform - only if falling
