@@ -14,7 +14,6 @@ def load_images(folder_path):
         images.append(folder_path + '/' + files)
     return images
 
-
 class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
