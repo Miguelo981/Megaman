@@ -20,6 +20,7 @@ class Player(pg.sprite.Sprite):
         self.game = game
         #self.image = pg.Surface((30, 40))
         self.path = os.getcwd()
+        self.img = pg.image.load(self.path+'\images\MM_WS.png')
         self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
         #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)

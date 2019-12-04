@@ -1,3 +1,5 @@
+from encodings.punycode import selective_find
+
 import pygame as pg
 import random
 from Settings import *
@@ -35,7 +37,8 @@ class Game:
                 #self.platforms.add(t)
                 x += 1
             y += 1
-        self.player.rect = self.move(tile_rects)
+        collisions= self.move(tile_rects)
+        #self.player.rect = self.move(tile_rects)
 
     def new(self):
         # start a new game
@@ -53,18 +56,20 @@ class Game:
         # Game Loop
         self.playing = True
         while self.playing:
+            self.charge_map()
             self.player.set_clock()
             self.clock.tick(FPS)
             self.events()
-            self.charge_map()
             self.update()
             self.draw()
 
     def update(self):
         #self.display.blit(pygame.transform.flip(self.player))
-        self.player.spawn()
+        #self.player.spawn()
         # Game Loop - Update
         self.all_sprites.update()
+        #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
+        self.display.blit(self.player.img, (15, 34))
 
         # check if player hits a platform - only if falling
         if self.player.vel.y > 0 and False:
@@ -154,8 +159,6 @@ class Game:
         for tile in tiles:
             if self.player.rect.colliderect(tile):
                 hit_list.append(tile)
-            '''if self.player.rect.colliderect(tile):
-                hit_list.append(tile)'''
         return hit_list
 
     def move(self, tiles):
@@ -169,7 +172,7 @@ class Game:
             elif self.player.vel.x < 0: #movement[0] < 0
                 self.player.rect.left = tile.right
                 collision_types['left'] = True
-        self.player.rect.y += self.player.vel.y
+        #self.player.rect.y += self.player.vel.y
         hit_list = self.collision_test(tiles)
         for tile in hit_list:
             if self.player.vel.y > 0:
@@ -195,9 +198,11 @@ class Game:
     def draw(self):
         # Game Loop - draw
         self.screen.fill(BLACK)
-        ###self.all_sprites.draw(self.screen)
+        self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
-        #screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
+        screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
+        screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
+        #self.display.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pg.display.flip()
 
     def show_start_screen(self):
