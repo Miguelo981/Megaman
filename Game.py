@@ -150,6 +150,7 @@ class Game:
     def collision_test(self, tiles):
         hit_list = []
         for tile in tiles:
+            print(self.player.rect)
             if self.player.rect.colliderect(tile):
                 hit_list.append(tile)
             '''if self.player.rect.colliderect(tile):
