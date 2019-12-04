@@ -40,7 +40,13 @@ class Game:
                 #self.platforms.add(t)
                 x += 1
             y += 1
-        collisions= self.move(tile_rects)
+        collisions = self.move(tile_rects)
+
+        if collisions['bottom'] == True:
+            print("sueloooooooooo")
+            #self.player.rect.y = 0
+        else:
+            pass
         #self.player.rect = self.move(tile_rects)
 
     def new(self):
@@ -73,7 +79,7 @@ class Game:
         self.all_sprites.update()
         #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
         #self.display.blit(pygame.transform.flip(self.player.img, False, False), (self.player.rect.x, self.player.rect.y))
-        self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
+        self.display.blit(self.player.img, (self.player.pos.x, self.player.pos.y))
         '''if self.player.moving:
             if self.player.right:
                 self.image = pg.image.load(self.move_right_sprites[self.count])
@@ -175,7 +181,7 @@ class Game:
         hit_list = []
         for tile in tiles:
             #print(self.player.rect)
-            if self.player.rect.colliderect(tile):
+            if self.player.pos.colliderect(tile):
                 hit_list.append(tile)
         return hit_list
 
@@ -185,19 +191,19 @@ class Game:
         hit_list = self.collision_test(tiles)
         for tile in hit_list:
             if self.player.vel.x > 0:
-                self.player.rect.right = tile.left
+                self.player.pos.right = tile.left
                 collision_types['right'] = True
             elif self.player.vel.x < 0: #movement[0] < 0
-                self.player.rect.left = tile.right
+                self.player.pos.left = tile.right
                 collision_types['left'] = True
         #self.player.rect.y += self.player.vel.y
         hit_list = self.collision_test(tiles)
         for tile in hit_list:
             if self.player.vel.y > 0:
-                self.player.rect.bottom = tile.top
+                self.player.pos.bottom = tile.top
                 collision_types['bottom'] = True
             elif self.player.vel.y < 0:
-                self.player.rect.top = tile.bottom
+                self.player.pos.top = tile.bottom
                 collision_types['top'] = True
         return collision_types
 
@@ -221,14 +227,14 @@ class Game:
         screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(WIDTH, HEIGHT, WIDTH, HEIGHT))
         for background_object in background_objects:
-            obj_rect = pygame.Rect(background_object[1][0] - self.player.rect.x * background_object[0],
-                                   background_object[1][1] - self.player.rect.y * background_object[0], background_object[1][2],
+            obj_rect = pygame.Rect(background_object[1][0] - self.player.pos.x * background_object[0],
+                                   background_object[1][1] - self.player.pos.y * background_object[0], background_object[1][2],
                                    background_object[1][3])
             if background_object[0] == 0.5:
                 pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
             else:
                 pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
-        pg.draw.rect(self.display, pg.image.load('images/bg.jpg'), pg.Rect(0, 0, WIDTH, HEIGHT))
+        pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, WIDTH, HEIGHT)) #pg.image.load('images/bg.jpg')
         #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
         #self.display.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pg.display.flip()

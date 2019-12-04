@@ -29,7 +29,11 @@ class Player(pg.sprite.Sprite):
         self.rect.y = 50
         #self.rect = self.image.get_rect()
         #self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        self.pos = vec(WIDTH / 2, HEIGHT / 2)
+        #self.pos = vec(WIDTH / 2, HEIGHT / 2)
+        self.pos = pygame.Rect(100,100,15,34)
+        self.pos.x = 50
+        self.pos.y = 50
+        #self.pos = vec(50,50)
         self.vel = vec(0, 0)
         self.acc = vec(0, 0)
         self.right = True
@@ -75,7 +79,7 @@ class Player(pg.sprite.Sprite):
         #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
         self.acc = vec(0, PLAYER_GRAV)
         keys = pg.key.get_pressed()
-        if self.vel.x >= 0 and self.vel.x < 1.5 or self.vel.x > -1.5 and self.vel.x <= 0:
+        if self.vel.x >= 0 and self.vel.x < 1 or self.vel.x > -1 and self.vel.x <= 0:
             self.moving = False
             self.count = 0
 
@@ -141,7 +145,7 @@ class Player(pg.sprite.Sprite):
             self.acc.x += self.vel.x * PLAYER_FRICTION
             # equations of motion
             self.vel += self.acc
-            self.pos += self.vel + 0.5 * self.acc
+            #self.pos += self.vel + 0.5 * self.acc
             # wrap around the sides of the screen
         if self.pos.x > WIDTH:
             self.pos.x = WIDTH
