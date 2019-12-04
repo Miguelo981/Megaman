@@ -12,6 +12,9 @@ class Game:
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.display = pg.Surface((300, 200))
+        #self.display.fill((255,255,255))
+        #self.background = pygame.image.load("images/bg.jpg")
+        #self.display.blit(self.background, (0,0))
         pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.running = True
@@ -69,6 +72,7 @@ class Game:
         # Game Loop - Update
         self.all_sprites.update()
         #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
+        #self.display.blit(pygame.transform.flip(self.player.img, False, False), (self.player.rect.x, self.player.rect.y))
         self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
         '''if self.player.moving:
             if self.player.right:
@@ -215,6 +219,16 @@ class Game:
         self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
         screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
+        pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(WIDTH, HEIGHT, WIDTH, HEIGHT))
+        for background_object in background_objects:
+            obj_rect = pygame.Rect(background_object[1][0] - self.player.rect.x * background_object[0],
+                                   background_object[1][1] - self.player.rect.y * background_object[0], background_object[1][2],
+                                   background_object[1][3])
+            if background_object[0] == 0.5:
+                pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
+            else:
+                pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
+        pg.draw.rect(self.display, pg.image.load('images/bg.jpg'), pg.Rect(0, 0, WIDTH, HEIGHT))
         #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
         #self.display.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pg.display.flip()
