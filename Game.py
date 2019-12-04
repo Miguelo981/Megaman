@@ -69,7 +69,20 @@ class Game:
         # Game Loop - Update
         self.all_sprites.update()
         #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
-        self.display.blit(self.player.img, (15, 34))
+        self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
+        '''if self.player.moving:
+            if self.player.right:
+                self.image = pg.image.load(self.move_right_sprites[self.count])
+            else:
+                self.image = pg.image.load(self.move_left_sprites[self.count])
+            if self.player.animation_counter > self.player.animation_cooldown:
+                self.count += 1
+                self.animation_counter = 0
+        else:
+            if self.player.right:
+                self.image = pg.image.load(self.path+'\images\MM_WS.png')
+            else:
+                self.image = pg.image.load(self.path + '\images\MM_WS_l.png')'''
 
         # check if player hits a platform - only if falling
         if self.player.vel.y > 0 and False:
@@ -157,7 +170,7 @@ class Game:
     def collision_test(self, tiles):
         hit_list = []
         for tile in tiles:
-            print(self.player.rect)
+            #print(self.player.rect)
             if self.player.rect.colliderect(tile):
                 hit_list.append(tile)
         return hit_list
@@ -202,7 +215,7 @@ class Game:
         self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
         screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
-        screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
+        #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
         #self.display.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pg.display.flip()
 

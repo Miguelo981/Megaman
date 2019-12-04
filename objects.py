@@ -25,6 +25,8 @@ class Player(pg.sprite.Sprite):
         #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)
         self.rect = pygame.Rect(100,100,15,34)
+        self.rect.x = 50
+        self.rect.y = 50
         #self.rect = self.image.get_rect()
         #self.rect.center = (WIDTH / 2, HEIGHT / 2)
         self.pos = vec(WIDTH / 2, HEIGHT / 2)
@@ -57,8 +59,11 @@ class Player(pg.sprite.Sprite):
         self.rect.x += 1
         hits = pg.sprite.spritecollide(self, self.game.platforms, False)
         self.rect.x -= 1
+        self.rect.y -= 5
         if hits:
             self.vel.y = -15
+        else:
+            self.rect.y += 2
 
     def set_clock(self):
         self.time = self.clock.tick()
@@ -80,23 +85,29 @@ class Player(pg.sprite.Sprite):
         if self.moving:
             if self.right:
                 self.image = pg.image.load(self.move_right_sprites[self.count])
+                self.img = pg.image.load(self.move_right_sprites[self.count])
             else:
                 self.image = pg.image.load(self.move_left_sprites[self.count])
+                self.img = pg.image.load(self.move_left_sprites[self.count])
             if self.animation_counter > self.animation_cooldown:
                 self.count += 1
                 self.animation_counter = 0
         else:
             if self.right:
                 self.image = pg.image.load(self.path+'\images\MM_WS.png')
+                self.img = pg.image.load(self.path + '\images\MM_WS.png')
             else:
                 self.image = pg.image.load(self.path + '\images\MM_WS_l.png')
+                self.img = pg.image.load(self.path + '\images\MM_WS_l.png')
 
         if keys[pg.K_LEFT] and not self.collide:
             self.acc.x = -PLAYER_ACC
+            self.rect.x -= 3
             self.right = False
             self.moving = True
         if keys[pg.K_RIGHT] and not self.collide:
             self.acc.x = PLAYER_ACC
+            self.rect.x += 3
             self.right = True
             self.moving = True
         #TODO CONTROL DEL DASH
@@ -115,6 +126,7 @@ class Player(pg.sprite.Sprite):
 
         if keys[pg.K_a] and keys[pg.K_RIGHT]:
             self.image = pg.image.load(self.path + '\images\MM_WS_dash_1.png')
+            self.img = pg.image.load(self.path + '\images\MM_WS_dash_1.png')
             self.moving = True
             if self.counter > self.cooldown:
                 for i in range(1, 5):
