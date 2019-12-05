@@ -147,6 +147,11 @@ class Player(pg.sprite.Sprite):
             self.vel += self.acc
             #self.pos += self.vel + 0.5 * self.acc
             # wrap around the sides of the screen
+        if self.rect.x > WIDTH:
+            self.rect.x = WIDTH
+        if self.rect.x < 0:
+            self.rect.x = 0
+
         if self.pos.x > WIDTH:
             self.pos.x = WIDTH
         if self.pos.x < 0:
