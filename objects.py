@@ -21,12 +21,13 @@ class Player(pg.sprite.Sprite):
         #self.image = pg.Surface((30, 40))
         self.path = os.getcwd()
         self.img = pg.image.load(self.path+'\images\MM_WS.png')
-        self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
+        #self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
         #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)
         self.rect = pygame.Rect(100,100,15,34)
         self.rect.x = 50
         self.rect.y = 50
+        print(self.rect,self.rect.x)
         #self.rect = self.image.get_rect()
         #self.rect.center = (WIDTH / 2, HEIGHT / 2)
         #self.pos = vec(WIDTH / 2, HEIGHT / 2)
@@ -90,13 +91,17 @@ class Player(pg.sprite.Sprite):
             if self.right:
                 self.image = pg.image.load(self.move_right_sprites[self.count])
                 self.img = pg.image.load(self.move_right_sprites[self.count])
+                self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
             else:
                 self.image = pg.image.load(self.move_left_sprites[self.count])
                 self.img = pg.image.load(self.move_left_sprites[self.count])
+                self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
             if self.animation_counter > self.animation_cooldown:
                 self.count += 1
                 self.animation_counter = 0
         else:
+            self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
+            print(self.rect.x)
             if self.right:
                 self.image = pg.image.load(self.path+'\images\MM_WS.png')
                 self.img = pg.image.load(self.path + '\images\MM_WS.png')
