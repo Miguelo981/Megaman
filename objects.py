@@ -1,6 +1,5 @@
 # Sprite classes for platform game
-import glob
-import os
+import glob, os
 
 import pygame as pg
 from Settings import *
@@ -17,6 +16,7 @@ def load_images(folder_path):
 class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
+        self.life = Life_Bar(100, "Boss", 5, 75, GREEN)
         self.game = game
         #self.image = pg.Surface((30, 40))
         self.img = pg.image.load(path+'\images\MM_WS.png')
@@ -26,7 +26,6 @@ class Player(pg.sprite.Sprite):
         self.rect = pygame.Rect(100,100,15,34)
         self.rect.x = 50
         self.rect.y = 50
-        print(self.rect,self.rect.x)
         #self.rect = self.image.get_rect()
         #self.rect.center = (WIDTH / 2, HEIGHT / 2)
         #self.pos = vec(WIDTH / 2, HEIGHT / 2)
@@ -78,6 +77,8 @@ class Player(pg.sprite.Sprite):
         #print(self.counter)
 
     def update(self):
+        if self.life.life <= 0:
+            print("muerto")
         #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
         self.acc = vec(0, PLAYER_GRAV)
         keys = pg.key.get_pressed()
@@ -166,12 +167,12 @@ class Player(pg.sprite.Sprite):
         #self.rect.midbottom = self.pos
 
 class Platform(pg.sprite.Sprite):
-    def __init__(self, x, y, w, h, main):
+    def __init__(self, x, y, w, h, main, color):
         pg.sprite.Sprite.__init__(self)
         self.h = h
         self.w = w
         self.image = pg.Surface((w, h))
-        self.image.fill(GREEN)
+        self.image.fill(color)
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -181,7 +182,6 @@ class Bullet(pg.sprite.Sprite):
     def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
         # self.image = pg.Surface((30, 40))
-        #self.img = pg.image.load(self.path + '\images\MM_WS.png')
         #self.img = pg.image.load(self.path + '\images\MM_WS.png')
         self.rect = pygame.Rect(0, 0, 8, 8)
         self.right = player.right
@@ -193,10 +193,6 @@ class Bullet(pg.sprite.Sprite):
         self.init_rect = self.rect.x
         self.img = pg.image.load(r'C:\Users\Miguelo\Documents\Megaman\images\blocks\grass.png')
         self.right = player.right
-        self.timer = 0
-        self.cooldown = 100
-        self.animation_cooldown = 15
-        self.time = clock.tick()
         self.active = True
         #self.spawn_sprites = load_images(self.path + '\images\shoot')
 
@@ -208,3 +204,54 @@ class Bullet(pg.sprite.Sprite):
         else:
             self.active = False
 
+class Enemy(pg.sprite.Sprite):
+    def __init__(self, life, x, y, w, h):
+        pg.sprite.Sprite.__init__(self)
+        self.life = Life_Bar(life)
+        # self.image = pg.Surface((30, 40))
+        #TODO SPRITE self.img = pg.image.load(path + '\images\MM_WS.png')
+        self.rect = pygame.Rect(x, y, w, h)
+        self.rect.x = x
+        self.rect.y = y
+        self.right = True
+        self.moving = False
+        self.timer = 0
+        self.cooldown = 100
+        self.animation_cooldown = 15
+        self.animation_counter = 0
+        self.counter = 0
+        self.count = 0
+        self.time = clock.tick()
+        self.shoot = False
+        self.shoots = []
+
+    def update(self):
+        pass
+
+    def behavior(self):
+        pass
+
+class Boss(Enemy):
+    def __init__(self, enemy):
+        self.enemy = enemy
+
+#TODO QUE LAS BARRAS DE LOS NO-BOSSES SIGA AL ENEMIGO EN LA CABEZA
+class Life_Bar(pg.sprite.Sprite):
+    def __init__(self, max_life, type, w, h, color):
+        pg.sprite.Sprite.__init__(self)
+        self.max_life = max_life
+        self.life = self.max_life
+        self.vissible = False
+        self.lifebar = Platform(0, 0, w, h, False, color)
+        self.type = type
+
+    def update(self):
+        pass
+
+    def quit_life(self, life):
+        self.life -= life
+
+    def add_life(self, life):
+        self.life += life
+        if self.life > self.max_life:
+            self.life = self.max_life

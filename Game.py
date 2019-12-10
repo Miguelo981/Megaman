@@ -20,6 +20,11 @@ class Game:
         self.running = True
         self.vertical_momentum = 0
         self.air_timer = 0
+        self.enemies = []
+        self.set_enemies()
+
+    def set_enemies(self):
+        pass
 
     def charge_map(self):
         '''true_scroll[0] += (self.player.rect.x - true_scroll[0] - 152) / 20
