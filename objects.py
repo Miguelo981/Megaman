@@ -51,6 +51,8 @@ class Player(pg.sprite.Sprite):
         self.spawn_sprites = load_images(path + '\images\MM_spawn')
         self.move_right_sprites = load_images(path+'\images\MM_move_r')
         self.move_left_sprites = load_images(path+'\images\MM_move_l')
+        self.shoot_sprite = load_images(path+'\images\MM_shoot')
+        self.shoot_running_sprite = load_images(path + '\images\MM_shoot_moving')
         self.shoot = False
         self.shoots = []
 
@@ -79,6 +81,7 @@ class Player(pg.sprite.Sprite):
     def update(self):
         if self.life.life <= 0:
             print("muerto")
+        print(self.count)
         #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
         self.acc = vec(0, PLAYER_GRAV)
         keys = pg.key.get_pressed()
@@ -86,30 +89,42 @@ class Player(pg.sprite.Sprite):
             self.moving = False
             self.count = 0
 
-        if self.count == 8:
+        if self.count == 4 and self.shoot and not self.moving:
             self.count = 0
 
+        if self.count == 8 and self.moving:
+            self.count = 0
+
+        if self.shoot:
+            if not self.moving:
+                self.img = pg.image.load(self.shoot_sprite[self.count])
+            elif self.moving:
+                self.img = pg.image.load(self.shoot_running_sprite[self.count])
+
         if self.moving:
-            if self.right:
+            if self.right and not self.shoot:
                 self.image = pg.image.load(self.move_right_sprites[self.count])
                 self.img = pg.image.load(self.move_right_sprites[self.count])
-                self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
-            else:
+                #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
+            '''elif not self.shoot:
                 self.image = pg.image.load(self.move_left_sprites[self.count])
                 self.img = pg.image.load(self.move_left_sprites[self.count])
-                self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
-            if self.animation_counter > self.animation_cooldown:
-                self.count += 1
-                self.animation_counter = 0
+                #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)'''
         else:
             self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
             #print(self.rect.x)
-            if self.right:
+            if self.right and not self.shoot:
                 self.image = pg.image.load(path+'\images\MM_WS.png')
                 self.img = pg.image.load(path + '\images\MM_WS.png')
-            else:
+            elif not self.shoot:
                 self.image = pg.image.load(path + '\images\MM_WS_l.png')
                 self.img = pg.image.load(path + '\images\MM_WS_l.png')
+            elif self.shoot_sprite:
+                self.img = pg.image.load(self.shoot_sprite[self.count])
+
+        if self.animation_counter > self.animation_cooldown:
+            self.count += 1
+            self.animation_counter = 0
 
         if keys[pg.K_LEFT] and not self.collide:
             self.acc.x = -PLAYER_ACC
@@ -186,23 +201,40 @@ class Bullet(pg.sprite.Sprite):
         self.rect = pygame.Rect(0, 0, 8, 8)
         self.right = player.right
         if self.right:
-            self.rect.x = player.rect.x+20
+            self.rect.x = player.rect.x+24
         else:
-            self.rect.x = player.rect.x-20
-        self.rect.y = player.rect.y+11
+            self.rect.x = player.rect.x-24
+        self.rect.y = player.rect.y+4
         self.init_rect = self.rect.x
-        self.img = pg.image.load(r'C:\Users\Miguelo\Documents\Megaman\images\blocks\grass.png')
+        #self.img = pg.image.load(r'Megaman\images\blocks\grass.png')
         self.right = player.right
         self.active = True
+        self.count = 0
+        self.shoot_sprites = load_images(path + '\images\MM_shoot_1')
         #self.spawn_sprites = load_images(self.path + '\images\shoot')
 
+    def set_clock(self):
+        self.time = self.clock.tick()
+        self.counter += self.time
+        self.animation_counter += self.time
+
     def update(self):
-        if self.rect.x < (self.init_rect+100) and self.right:
+        self.img = pg.image.load(self.shoot_sprites[self.count])
+
+        '''if self.animation_counter > self.animation_cooldown:
+            self.count += 1
+            self.animation_counter = 0'''
+
+        if self.rect.x < (self.init_rect+120) and self.right:
             self.rect.x += 10
-        elif self.rect.x > (self.init_rect-100) and not self.right:
+            self.count += 1
+        elif self.rect.x > (self.init_rect-120) and not self.right:
             self.rect.x -= 10
+            self.count += 1
         else:
             self.active = False
+        if self.count > 4:
+            self.count = 0
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, life, x, y, w, h):

@@ -62,7 +62,8 @@ class Game:
         else:
             self.air_timer += 1
 
-        self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
+        self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
+        #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
         #self.player.rect = self.move(tile_rects)
 
     def new(self):
@@ -97,7 +98,8 @@ class Game:
         for bullet in self.player.shoots:
             bullet.update()
             if bullet.active:
-                self.display.blit(bullet.img, (bullet.rect.x, bullet.rect.y))
+                #self.display.blit(bullet.img, (bullet.rect.x, bullet.rect.y))
+                self.display.blit(pygame.transform.flip(bullet.img, not bullet.right, False), (bullet.rect.x, bullet.rect.y))
             else:
                 self.player.shoots.remove(bullet)
 
@@ -211,7 +213,6 @@ class Game:
             if event.type == pg.KEYUP:
                 if event.key == pg.K_z and self.player.shoot:
                     self.player.shoots.append(Bullet(self.player))
-
                     self.player.shoot = False
 
     def draw(self):
