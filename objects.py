@@ -19,8 +19,7 @@ class Player(pg.sprite.Sprite):
         pg.sprite.Sprite.__init__(self)
         self.game = game
         #self.image = pg.Surface((30, 40))
-        self.path = os.getcwd()
-        self.img = pg.image.load(self.path+'\images\MM_WS.png')
+        self.img = pg.image.load(path+'\images\MM_WS.png')
         #self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
         #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
         #self.image.fill(YELLOW)
@@ -50,9 +49,11 @@ class Player(pg.sprite.Sprite):
         self.count = 0
         self.time = clock.tick()
         self.collide = False
-        self.spawn_sprites = load_images(self.path + '\images\MM_spawn')
-        self.move_right_sprites = load_images(self.path+'\images\MM_move_r')
-        self.move_left_sprites = load_images(self.path+'\images\MM_move_l')
+        self.spawn_sprites = load_images(path + '\images\MM_spawn')
+        self.move_right_sprites = load_images(path+'\images\MM_move_r')
+        self.move_left_sprites = load_images(path+'\images\MM_move_l')
+        self.shoot = False
+        self.shoots = []
 
     def spawn(self):
             if self.animation_counter > self.animation_cooldown and self.count <= 11:
@@ -101,13 +102,13 @@ class Player(pg.sprite.Sprite):
                 self.animation_counter = 0
         else:
             self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
-            print(self.rect.x)
+            #print(self.rect.x)
             if self.right:
-                self.image = pg.image.load(self.path+'\images\MM_WS.png')
-                self.img = pg.image.load(self.path + '\images\MM_WS.png')
+                self.image = pg.image.load(path+'\images\MM_WS.png')
+                self.img = pg.image.load(path + '\images\MM_WS.png')
             else:
-                self.image = pg.image.load(self.path + '\images\MM_WS_l.png')
-                self.img = pg.image.load(self.path + '\images\MM_WS_l.png')
+                self.image = pg.image.load(path + '\images\MM_WS_l.png')
+                self.img = pg.image.load(path + '\images\MM_WS_l.png')
 
         if keys[pg.K_LEFT] and not self.collide:
             self.acc.x = -PLAYER_ACC
@@ -134,8 +135,8 @@ class Player(pg.sprite.Sprite):
                 #self.vel.x = 0
 
         if keys[pg.K_a] and keys[pg.K_RIGHT]:
-            self.image = pg.image.load(self.path + '\images\MM_WS_dash_1.png')
-            self.img = pg.image.load(self.path + '\images\MM_WS_dash_1.png')
+            self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
+            self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
             self.moving = True
             if self.counter > self.cooldown:
                 for i in range(1, 5):
@@ -175,3 +176,35 @@ class Platform(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.main = main
+
+class Bullet(pg.sprite.Sprite):
+    def __init__(self, player):
+        pg.sprite.Sprite.__init__(self)
+        # self.image = pg.Surface((30, 40))
+        #self.img = pg.image.load(self.path + '\images\MM_WS.png')
+        #self.img = pg.image.load(self.path + '\images\MM_WS.png')
+        self.rect = pygame.Rect(0, 0, 8, 8)
+        self.right = player.right
+        if self.right:
+            self.rect.x = player.rect.x+20
+        else:
+            self.rect.x = player.rect.x-20
+        self.rect.y = player.rect.y+11
+        self.init_rect = self.rect.x
+        self.img = pg.image.load(r'C:\Users\Miguelo\Documents\Megaman\images\blocks\grass.png')
+        self.right = player.right
+        self.timer = 0
+        self.cooldown = 100
+        self.animation_cooldown = 15
+        self.time = clock.tick()
+        self.active = True
+        #self.spawn_sprites = load_images(self.path + '\images\shoot')
+
+    def update(self):
+        if self.rect.x < (self.init_rect+100) and self.right:
+            self.rect.x += 10
+        elif self.rect.x > (self.init_rect-100) and not self.right:
+            self.rect.x -= 10
+        else:
+            self.active = False
+

@@ -1,5 +1,5 @@
 import pygame
-import sys
+import sys, os
 
 def main_menu():
     menu = True
@@ -146,6 +146,7 @@ YELLOW = (255, 255, 0)
 LIGHTBLUE = (0, 155, 155)
 GOLD = (249, 166, 2)
 DARK = (7, 7, 23)
+path = os.getcwd()
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))

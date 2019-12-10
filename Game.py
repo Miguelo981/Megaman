@@ -88,6 +88,14 @@ class Game:
         #self.player.spawn()
         # Game Loop - Update
         self.all_sprites.update()
+
+        for bullet in self.player.shoots:
+            bullet.update()
+            if bullet.active:
+                self.display.blit(bullet.img, (bullet.rect.x, bullet.rect.y))
+            else:
+                self.player.shoots.remove(bullet)
+
         #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
         #self.display.blit(pygame.transform.flip(self.player.img, False, False), (self.player.rect.x, self.player.rect.y))
         ###self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
@@ -189,18 +197,26 @@ class Game:
                     self.playing = False
                 self.running = False
             if event.type == pg.KEYDOWN:
+                if event.key == pg.K_z:
+                    self.player.shoot = True
                 if event.key == pg.K_SPACE:
                     if self.air_timer < 6:
                         self.vertical_momentum = -5
                     #self.player.jump()
+            if event.type == pg.KEYUP:
+                if event.key == pg.K_z and self.player.shoot:
+                    self.player.shoots.append(Bullet(self.player))
+
+                    self.player.shoot = False
 
     def draw(self):
         # Game Loop - draw
-        self.screen.fill(BLACK)
-        self.all_sprites.draw(self.screen)
+        #self.screen.fill(BLACK)
+        #self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
         screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(WIDTH, HEIGHT, WIDTH, HEIGHT))
+        pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, WIDTH, HEIGHT))
         for background_object in background_objects:
             obj_rect = pygame.Rect(background_object[1][0] - self.player.rect.x * background_object[0],
                                    background_object[1][1] - self.player.rect.y * background_object[0], background_object[1][2],
@@ -209,7 +225,8 @@ class Game:
                 pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
             else:
                 pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
-        pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, WIDTH, HEIGHT)) #pg.image.load('images/bg.jpg')
+
+        #pg.image.load('images/bg.jpg')
         #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
         #self.display.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         pg.display.flip()
