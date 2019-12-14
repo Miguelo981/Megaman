@@ -81,7 +81,6 @@ class Player(pg.sprite.Sprite):
     def update(self):
         if self.life.life <= 0:
             print("muerto")
-        print(self.count)
         #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
         self.acc = vec(0, PLAYER_GRAV)
         keys = pg.key.get_pressed()
