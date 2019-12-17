@@ -24,7 +24,7 @@ class Game:
         self.set_enemies()
 
     def set_enemies(self):
-        pass
+        self.enemies.append(Enemy(50, 150, 10, 100, 143))
 
     def charge_map(self):
         '''true_scroll[0] += (self.player.rect.x - true_scroll[0] - 152) / 20
@@ -32,7 +32,8 @@ class Game:
         scroll = true_scroll.copy()
         scroll[0] = int(scroll[0])
         scroll[1] = int(scroll[1])'''
-        tile_rects = []
+        self.tile_rects = []
+        #tile_rects = []
         y = 0
         for layer in game_map:
             x = 0
@@ -42,7 +43,7 @@ class Game:
                 if tile == '2':
                     self.display.blit(grass_img, (x * 16, y * 16))
                 if tile != '0':
-                    tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
+                    self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
                 #self.all_sprites.add(t)
                 #self.platforms.add(t)
                 x += 1
@@ -53,7 +54,7 @@ class Game:
         if self.vertical_momentum > 3:
             self.vertical_momentum = 3
 
-        collisions = self.move(tile_rects)
+        collisions = self.move(self.tile_rects)
 
         if collisions['bottom'] == True:
             self.air_timer = 0
@@ -61,6 +62,9 @@ class Game:
             #self.player.rect.y = 0
         else:
             self.air_timer += 1
+
+        if self.collision_player_enemy():
+            pass
 
         self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
         #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
@@ -89,6 +93,29 @@ class Game:
             self.update()
             self.draw()
 
+    def collision_bullet(self, bullet):
+        for tile in self.tile_rects:
+            #print(self.player.rect)
+            if bullet.rect.colliderect(tile):
+                self.tile_rects.remove(tile)
+                return True
+        return False
+
+    def collision_enemy(self, bullet):
+        for enemy in self.enemies:
+            if bullet.rect.colliderect(enemy):
+                enemy.kill()
+                self.enemies.remove(enemy)
+                return True
+        return False
+
+    def collision_player_enemy(self):
+        for enemy in self.enemies:
+            if self.player.rect.colliderect(enemy):
+                print("AAAAAAAAAAAAAAH")
+                return True
+        return False
+
     def update(self):
         #self.display.blit(pygame.transform.flip(self.player))
         #self.player.spawn()
@@ -100,6 +127,10 @@ class Game:
             if bullet.active:
                 #self.display.blit(bullet.img, (bullet.rect.x, bullet.rect.y))
                 self.display.blit(pygame.transform.flip(bullet.img, not bullet.right, False), (bullet.rect.x, bullet.rect.y))
+                if self.collision_bullet(bullet):
+                    bullet.active = False
+                if self.collision_enemy(bullet):
+                    bullet.active = False
             else:
                 self.player.shoots.remove(bullet)
 
@@ -231,6 +262,9 @@ class Game:
                 pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
             else:
                 pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
+
+        for enemy in self.enemies:
+            self.display.blit(pygame.transform.flip(enemy.img, not enemy.right, False), (enemy.rect.x, enemy.rect.y))
 
         #pg.image.load('images/bg.jpg')
         #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))

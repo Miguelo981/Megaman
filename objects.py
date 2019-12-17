@@ -156,6 +156,7 @@ class Player(pg.sprite.Sprite):
             if self.counter > self.cooldown:
                 for i in range(1, 5):
                     self.vel.x += 1.5
+                    self.pos.x += 1.5
                     #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
                     #if hits:
                         #self.vel.x += 0.75
@@ -238,8 +239,9 @@ class Bullet(pg.sprite.Sprite):
 class Enemy(pg.sprite.Sprite):
     def __init__(self, life, x, y, w, h):
         pg.sprite.Sprite.__init__(self)
-        self.life = Life_Bar(life)
+        #self.life = Life_Bar(life)
         # self.image = pg.Surface((30, 40))
+        self.img = pg.image.load(path + '\images\omega.png')
         #TODO SPRITE self.img = pg.image.load(path + '\images\MM_WS.png')
         self.rect = pygame.Rect(x, y, w, h)
         self.rect.x = x

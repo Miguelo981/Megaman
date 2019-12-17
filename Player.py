@@ -92,3 +92,13 @@ class Platform(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.main = main
+
+class Enemy(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
+        #self.image = pg.Surface((30, 40))
+        self.image = pg.Surface((100, 143))
+        self.image = pg.image.load('images/omega.png')
+        #self.image.fill(YELLOW)
+        self.rect = self.image.get_rect()
+        self.rect.center = (WIDTH / 1.5, HEIGHT / 1.5)
