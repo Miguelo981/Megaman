@@ -101,7 +101,7 @@ class Player(pg.sprite.Sprite):
                 self.img = pg.image.load(self.shoot_running_sprite[self.count])
 
         if self.moving:
-            if self.right and not self.shoot:
+            if not self.shoot:
                 self.image = pg.image.load(self.move_right_sprites[self.count])
                 self.img = pg.image.load(self.move_right_sprites[self.count])
                 #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
@@ -112,7 +112,7 @@ class Player(pg.sprite.Sprite):
         else:
             self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
             #print(self.rect.x)
-            if self.right and not self.shoot:
+            if not self.shoot:
                 self.image = pg.image.load(path+'\images\MM_WS.png')
                 self.img = pg.image.load(path + '\images\MM_WS.png')
             elif not self.shoot:
