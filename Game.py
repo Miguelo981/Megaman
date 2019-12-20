@@ -67,6 +67,10 @@ class Game:
             pass
 
         self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
+        self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
+        self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
+        self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
+
         #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
         #self.player.rect = self.move(tile_rects)
 
@@ -76,6 +80,7 @@ class Game:
         self.platforms = pg.sprite.Group()
         self.player = Player(self)
         self.all_sprites.add(self.player)
+        self.all_sprites.add(self.enemies)
         '''for plat in PLATFORM_LIST:
             p = Platform(*plat)
             self.all_sprites.add(p)
@@ -113,6 +118,7 @@ class Game:
         for enemy in self.enemies:
             if self.player.rect.colliderect(enemy):
                 print("AAAAAAAAAAAAAAH")
+                self.player.life.quit_life(3)
                 return True
         return False
 
@@ -133,6 +139,7 @@ class Game:
                     bullet.active = False
             else:
                 self.player.shoots.remove(bullet)
+                self.player.life.quit_life(5)
 
         #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
         #self.display.blit(pygame.transform.flip(self.player.img, False, False), (self.player.rect.x, self.player.rect.y))
