@@ -22,9 +22,11 @@ class Game:
         self.air_timer = 0
         self.enemies = []
         self.set_enemies()
+        self.counter = 0
+        self.time = 0
 
     def set_enemies(self):
-        self.enemies.append(Enemy(50, 150, 10, 100, 143))
+        self.enemies.append(Enemy(50, 150, 10, 100, 143, self))
 
     def charge_map(self):
         '''true_scroll[0] += (self.player.rect.x - true_scroll[0] - 152) / 20
@@ -70,6 +72,12 @@ class Game:
         self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
         self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
+        for enemy in self.enemies:
+            if enemy.life.w > 0:
+                self.display.blit(enemy.life.image, (enemy.rect.x + 25, enemy.rect.y - 10))
+            else:
+                enemy.kill()
+                self.enemies.remove(enemy)
 
         #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
         #self.player.rect = self.move(tile_rects)
@@ -109,8 +117,11 @@ class Game:
     def collision_enemy(self, bullet):
         for enemy in self.enemies:
             if bullet.rect.colliderect(enemy):
-                enemy.kill()
-                self.enemies.remove(enemy)
+                if bullet.special:
+                    enemy.life.quit_enemy_life(9)
+                    enemy.life.constant_dmg = 3
+                else:
+                    enemy.life.quit_enemy_life(3)
                 return True
         return False
 
@@ -139,7 +150,7 @@ class Game:
                     bullet.active = False
             else:
                 self.player.shoots.remove(bullet)
-                self.player.life.quit_life(5)
+                #self.player.life.quit_life(5)
 
         #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
         #self.display.blit(pygame.transform.flip(self.player.img, False, False), (self.player.rect.x, self.player.rect.y))
@@ -248,10 +259,19 @@ class Game:
                     if self.air_timer < 6:
                         self.vertical_momentum = -5
                     #self.player.jump()
+                if event.key == pg.K_z:
+                    self.player.counter = 0
             if event.type == pg.KEYUP:
                 if event.key == pg.K_z and self.player.shoot:
-                    self.player.shoots.append(Bullet(self.player))
-                    self.player.shoot = False
+                    if self.player.counter > 350:
+                        bullet = Bullet(self.player)
+                        bullet.special = True
+                        self.player.shoots.append(bullet)
+                    else:
+                        self.player.shoots.append(Bullet(self.player))
+                        self.player.shoot = False
+            self.counter += self.time
+            #print(self.counter)
 
     def draw(self):
         # Game Loop - draw

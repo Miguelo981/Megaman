@@ -6,8 +6,8 @@ def main_menu():
     selected = "start"
 
     pygame.init()
-    song = 'music/main_theme.mp3'
-    music(song, True)
+    ###song = 'music/main_theme.mp3'
+    #music(song, True)
     pygame.mixer.init()
 
     while menu:
@@ -27,9 +27,10 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         print("Start")
-                        music(song, False)
+                        music('music/vs_omega.mp3', True)
+                        #####music(song, False)
                         #import Stage
-                        music('music/stage_1.mp3', True)
+                        #####music('music/stage_1.mp3', True)
                         import Game
                     if selected == "controls":
                         print("Controls")

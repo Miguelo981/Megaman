@@ -196,6 +196,7 @@ class Bullet(pg.sprite.Sprite):
         self.init_rect = self.rect.x
         #self.img = pg.image.load(r'Megaman\images\blocks\grass.png')
         self.right = player.right
+        self.special = False
         self.active = True
         self.count = 0
         self.shoot_sprites = load_images(path + '\images\MM_shoot_1')
@@ -225,17 +226,20 @@ class Bullet(pg.sprite.Sprite):
             self.count = 0
 
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, life, x, y, w, h):
+    def __init__(self, life, x, y, w, h, game):
         pg.sprite.Sprite.__init__(self)
+        self.game = game
         #self.life = Life_Bar(life)
         # self.image = pg.Surface((30, 40))
-        self.img = pg.image.load(path + '\images\omega.png')
+        self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
+        #self.img = pg.image.load(path + '\images\omega.png')
         #TODO SPRITE self.img = pg.image.load(path + '\images\MM_WS.png')
         self.rect = pygame.Rect(x, y, w, h)
         self.y = y
         self.x = x
         self.rect.x = x
         self.rect.y = y
+        self.life = Life_Bar("Boss", 84, 6, RED)
         self.right = True
         self.moving = False
         self.timer = 0
@@ -248,8 +252,17 @@ class Enemy(pg.sprite.Sprite):
         self.shoot = False
         self.shoots = []
         self.down = False
+        self.clock = self.game.clock
+        self.dmg_coldown = 100
 
     def update(self):
+        self.life.set_clock(self.clock)
+        if self.life.constant_dmg == 3:
+            self.img = pg.image.load(path + '\images\Bosses\Omega\damage.png')
+            self.life.inmunity()
+        else:
+            self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
+
         if self.rect.y < (self.y+10) and not self.down:
             self.rect.y += 1
         else:
@@ -285,9 +298,28 @@ class Life_Bar(pg.sprite.Sprite):
         self.rect.x = 5
         self.rect.y = 38
         self.type = type
+        self.constant_dmg = 0
+        self.counter = 0
+        self.time = 0
+
+    def set_clock(self, clock):
+        if self.constant_dmg == 3:
+            self.time = clock.tick()
+            self.counter += self.time
 
     def update(self):
         pass
+
+    def inmunity(self):
+        if self.constant_dmg == 3:
+            if self.counter > 15:
+                self.constant_dmg = 0
+                self.counter = 0
+                return False
+            else:
+                return True
+        else:
+            return False
 
     def quit_life(self, life):
         self.h -= life
@@ -295,6 +327,15 @@ class Life_Bar(pg.sprite.Sprite):
             self.h = 0
         self.image = pg.Surface((self.w, self.h))
         self.image.fill(self.color)
+
+    def quit_enemy_life(self, life):
+        if not self.inmunity():
+            self.constant_dmg += 1
+            self.w -= life
+            if self.w < 0:
+                self.w = 0
+            self.image = pg.Surface((self.w, self.h))
+            self.image.fill(self.color)
 
     def add_life(self, life):
         self.h += life
