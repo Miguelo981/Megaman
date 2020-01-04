@@ -137,6 +137,9 @@ class Player(pg.sprite.Sprite):
             self.moving = True
         #TODO CONTROL DEL DASH
         if keys[pg.K_a] and keys[pg.K_LEFT]:
+            self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
+            self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
+            self.right = False
             if self.counter > self.cooldown:
                 self.moving = True
                 for i in range(1,5):
@@ -152,6 +155,8 @@ class Player(pg.sprite.Sprite):
         if keys[pg.K_a] and keys[pg.K_RIGHT]:
             self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
             self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
+            self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
+            #self.rect = pygame.Rect(self.image.get_rect())
             self.moving = True
             if self.counter > self.cooldown:
                 for i in range(1, 5):
@@ -254,6 +259,7 @@ class Enemy(pg.sprite.Sprite):
         self.down = False
         self.clock = self.game.clock
         self.dmg_coldown = 100
+        self.assault = False
 
     def update(self):
         self.life.set_clock(self.clock)
@@ -263,11 +269,11 @@ class Enemy(pg.sprite.Sprite):
         else:
             self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
 
-        if self.rect.y < (self.y+10) and not self.down:
+        if self.rect.y < (self.y+10) and not self.down and not self.assault:
             self.rect.y += 1
         else:
             self.down = True
-        if self.rect.y > (self.y-10) and self.down:
+        if self.rect.y > (self.y-10) and self.down and not self.assault:
             self.rect.y -= 1
         else:
             self.down = False
@@ -275,9 +281,205 @@ class Enemy(pg.sprite.Sprite):
     def behavior(self):
         pass
 
+class Omega(pg.sprite.Sprite):
+    def __init__(self, enemy, player):
+        pg.sprite.Sprite.__init__(self)
+        self.enemy = enemy
+        self.left_hand = Left_hand(self.enemy.x, self.enemy.y, player)
+        self.right_hand = Right_hand(self.enemy.x, self.enemy.y, player)
+        self.ball = None
+
+    def update(self):
+        self.enemy.update()
+        self.left_hand.update(self.enemy)
+        self.right_hand.update(self.enemy)
+        if self.ball != None:
+            self.ball.update(True)
+        if self.enemy.life.constant_dmg == 3:
+            self.enemy.assault = True
+            self.left_hand.attack()
+            if self.enemy.life.w < 60:
+                self.right_hand.attack()
+            if self.enemy.life.w < 70:
+                self.ball = Ball()
+        else:
+            self.ball = None
+        if self.left_hand.rings_number == 3:
+            self.enemy.assault = False
+
+class Left_hand(pg.sprite.Sprite):
+    def __init__(self, x, y, player):
+        pg.sprite.Sprite.__init__(self)
+        self.base = pg.image.load(path + '\images\Bosses\Omega\left_hand.png')
+        self.open = pg.image.load(path + '\images\Bosses\Omega\hand_open.png')
+        self.left = False
+        self.img = self.base
+        self.rect = pygame.Rect(self.img.get_rect())
+        self.basex = x+6
+        self.basey = y+60
+        self.rect.x = self.basex
+        self.rect.y = self.basey
+        self.attacking = False
+        self.player = player
+        self.able_to_move = True
+        self.attack_coldown = 350
+        self.rings = load_images(path+r'\images\Bosses\Omega\V_Rings')
+        self.counter = 0
+        self.rings_number = 0
+        self.ring = None
+        self.left_mode = True
+
+    def update(self, enemy):
+        if not self.attacking:
+            self.rect.x = enemy.rect.x+6
+            self.rect.y = enemy.rect.y+60
+        if self.attacking:
+            self.left = True
+            if self.rect.y > 0 and self.able_to_move:
+                self.rect.y -=3
+            elif self.rect.x > 25 and self.able_to_move and self.rect.x+1 != self.player.rect.x and self.rect.x-1 != self.player.rect.x and self.rect.x != self.player.rect.x and self.left_mode:
+                self.rect.x -=3
+            elif self.rect.x < self.basex-50 and self.able_to_move and self.rect.x + 1 != self.player.rect.x and self.rect.x - 1 != self.player.rect.x and self.rect.x != self.player.rect.x and not self.left_mode:
+                self.rect.x +=3
+            else:
+                self.able_to_move = False
+                if self.rings_number != 3:
+                    self.shoot()
+                else:
+                    self.ring = None
+                    self.attacking = False
+                    self.rings_number = 0
+                    self.left = False
+                    self.able_to_move = True
+                    self.img = self.base
+
+    def shoot(self):
+        if self.counter < len(self.rings):
+            self.ring = Ring(self.rect.x, self.rect.y, pg.image.load(self.rings[self.counter]).get_rect())
+            self.ring.img = pg.image.load(self.rings[self.counter])
+            self.counter += 1
+        if self.ring.rect.y < HEIGHT-350:
+            self.ring.rect.y += 4
+        else:
+            self.ring.kill()
+            self.rings_number += 1
+            self.counter = 0
+            self.able_to_move = True
+            if self.rect.x < 25:
+                self.left_mode = False
+            else:
+                self.left_mode = True
+
+    def attack(self):
+        self.attacking = True
+        self.img = self.open
+        #self.attacking = False
+
+class Right_hand(pg.sprite.Sprite):
+    def __init__(self, x, y, player):
+        pg.sprite.Sprite.__init__(self)
+        self.base = pg.image.load(path + r'\images\Bosses\Omega\right_hand.png')
+        self.open = pg.image.load(path + r'\images\Bosses\Omega\r_open.png')
+        self.img = self.base
+        self.rect = pygame.Rect(self.img.get_rect())
+        self.basex = x-6
+        self.basey = y+60
+        self.rect.x = self.basex
+        self.rect.y = self.basey
+        self.attacking = False
+        self.player = player
+        self.able_to_move = True
+        self.attack_coldown = 350
+        self.rings = load_images(path+'\images\Bosses\Omega\Ring')
+        self.counter = 0
+        self.rings_number = 0
+        self.ring = None
+        self.down_mode = True
+
+    def update(self, enemy):
+        if not self.attacking:
+            self.rect.x = enemy.rect.x+50
+            self.rect.y = enemy.rect.y+65
+        if self.attacking:
+            self.left = True
+            if self.rect.y < 110 and self.able_to_move and self.down_mode:
+                self.rect.y +=3
+            elif self.rect.y > 50 and self.able_to_move and self.rect.y+1 != self.player.rect.y and self.rect.y-1 != self.player.rect.y and self.rect.y != self.player.rect.y and not self.down_mode:
+                self.rect.y -=3
+            else:
+                self.able_to_move = False
+                if self.rings_number != 3:
+                    self.shoot()
+                else:
+                    self.ring = None
+                    self.attacking = False
+                    self.rings_number = 0
+                    self.able_to_move = True
+                    self.img = self.base
+
+    def shoot(self):
+        if self.counter < len(self.rings):
+            self.ring = Ring(self.rect.x, self.rect.y, pg.image.load(self.rings[self.counter]).get_rect())
+            self.ring.img = pg.image.load(self.rings[self.counter])
+            self.counter += 1
+        if self.ring.rect.x > -25:
+            self.ring.rect.x -= 4
+        else:
+            self.rect.x -= 18
+            self.ring.kill()
+            self.rings_number += 1
+            self.counter = 0
+            self.able_to_move = True
+            if self.rect.y < 110:
+                self.down_mode = True
+            else:
+                self.down_mode = False
+
+    def attack(self):
+        self.attacking = True
+        self.img = self.open
+        #self.attacking = False
+
+class Ring(pg.sprite.Sprite):
+    def __init__(self, x, y, rect):
+        pg.sprite.Sprite.__init__(self)
+        self.img = None
+        self.rect = pygame.Rect(rect)
+        self.rect.x = x
+        if y < 50:
+            self.rect.y = y+20
+        else:
+            self.rect.y = y
+            self.rect.x = x+5
+
+class Ball(pygame.sprite.Sprite):
+    def __init__(self):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(path+r'\images\Bosses\Omega\Ball\1.png')
+        self.rect = self.image.get_rect()
+        self.rect.x = WIDTH / 2
+        self.rect.y = HEIGHT / 2
+        self.speed = [15,15]
+        self.attacking = False
+
+    def update(self, state):
+        if state:
+            if self.rect.top <= 0:
+                self.speed[1] = -self.speed[1]-5
+            elif self.rect.right >= WIDTH or self.rect.left <= 0:
+                self.speed[0] = -self.speed[0]
+            self.rect.move_ip(self.speed)
+        if self.rect.centerx < WIDTH / 2:  # comprobamos en que lado de la pantalla esta el jugador
+            self.speed = [15, -15]
+        else:  # queremos que la pelota salga hacia su lado
+            self.speed = [-15, -15]
+
 class Boss(Enemy):
     def __init__(self, enemy):
         self.enemy = enemy
+
+    def update(self):
+        pass
 
 #TODO QUE LAS BARRAS DE LOS NO-BOSSES SIGA AL ENEMIGO EN LA CABEZA
 class Life_Bar(pg.sprite.Sprite):

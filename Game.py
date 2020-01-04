@@ -11,7 +11,7 @@ class Game:
         pg.init()
         pg.mixer.init()
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        self.display = pg.Surface((300, 200))
+        self.display = pg.Surface((275, 150)) #300 200
         #self.display.fill((255,255,255))
         #self.background = pygame.image.load("images/bg.jpg")
         #self.display.blit(self.background, (0,0))
@@ -21,12 +21,11 @@ class Game:
         self.vertical_momentum = 0
         self.air_timer = 0
         self.enemies = []
-        self.set_enemies()
         self.counter = 0
         self.time = 0
 
     def set_enemies(self):
-        self.enemies.append(Enemy(50, 150, 10, 100, 143, self))
+        self.enemies.append(Omega(Enemy(50, 155, 10, 100, 143, self), self.player))
 
     def charge_map(self):
         '''true_scroll[0] += (self.player.rect.x - true_scroll[0] - 152) / 20
@@ -68,15 +67,18 @@ class Game:
         if self.collision_player_enemy():
             pass
 
+        if self.collision_player_rings():
+            pass #TODO ADD DMG ANIMATION
+
         self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
         self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
         self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
         for enemy in self.enemies:
-            if enemy.life.w > 0:
-                self.display.blit(enemy.life.image, (enemy.rect.x + 25, enemy.rect.y - 10))
+            if enemy.enemy.life.w > 0:
+                self.display.blit(enemy.enemy.life.image, (enemy.enemy.rect.x + 25, enemy.enemy.rect.y - 10))
             else:
-                enemy.kill()
+                enemy.enemy.kill()
                 self.enemies.remove(enemy)
 
         #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
@@ -87,6 +89,7 @@ class Game:
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.player = Player(self)
+        self.set_enemies()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.enemies)
         '''for plat in PLATFORM_LIST:
@@ -116,21 +119,35 @@ class Game:
 
     def collision_enemy(self, bullet):
         for enemy in self.enemies:
-            if bullet.rect.colliderect(enemy):
+            if bullet.rect.colliderect(enemy.enemy):
                 if bullet.special:
-                    enemy.life.quit_enemy_life(9)
-                    enemy.life.constant_dmg = 3
+                    enemy.enemy.life.quit_enemy_life(9)
+                    enemy.enemy.life.constant_dmg = 3
                 else:
-                    enemy.life.quit_enemy_life(3)
+                    enemy.enemy.life.quit_enemy_life(3)
                 return True
         return False
 
     def collision_player_enemy(self):
         for enemy in self.enemies:
-            if self.player.rect.colliderect(enemy):
+            if self.player.rect.colliderect(enemy.enemy):
                 print("AAAAAAAAAAAAAAH")
                 self.player.life.quit_life(3)
                 return True
+        return False
+
+    def collision_player_rings(self):
+        for enemy in self.enemies:
+            if enemy.left_hand.ring != None:
+                if self.player.rect.colliderect(enemy.left_hand.ring):
+                    print("AAAAAAAAAAAAAAH")
+                    self.player.life.quit_life(5)
+                    return True
+            if enemy.right_hand.ring != None:
+                if self.player.rect.colliderect(enemy.right_hand.ring):
+                    print("AAAAAAAAAAAAAAH")
+                    self.player.life.quit_life(5)
+                    return True
         return False
 
     def update(self):
@@ -262,6 +279,8 @@ class Game:
                 if event.key == pg.K_z:
                     self.player.counter = 0
             if event.type == pg.KEYUP:
+                if event.key == pg.K_a:
+                    self.player.rect = pygame.Rect(self.player.rect.x,self.player.rect.y-10,15,34)
                 if event.key == pg.K_z and self.player.shoot:
                     if self.player.counter > 350:
                         bullet = Bullet(self.player)
@@ -289,9 +308,20 @@ class Game:
                 pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
             else:
                 pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
-
+        #image = pygame.transform.scale(pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), (300, 200))
+        image = pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png')
+        self.display.blit(image, image.get_rect())
         for enemy in self.enemies:
-            self.display.blit(pygame.transform.flip(enemy.img, not enemy.right, False), (enemy.rect.x, enemy.rect.y))
+            if enemy.__class__.__name__ == "Omega":
+                self.display.blit(pygame.transform.flip(enemy.left_hand.img, enemy.left_hand.left, False),(enemy.left_hand.rect.x, enemy.left_hand.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.enemy.img, not enemy.enemy.right, False), (enemy.enemy.rect.x, enemy.enemy.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.right_hand.img, False, False),(enemy.right_hand.rect.x, enemy.right_hand.rect.y))
+                if enemy.left_hand.ring != None:
+                    self.display.blit(pygame.transform.flip(enemy.left_hand.ring.img, not enemy.enemy.right, False), (enemy.left_hand.ring.rect.x, enemy.left_hand.ring.rect.y))
+                if enemy.right_hand.ring != None:
+                    self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x, enemy.right_hand.ring.rect.y))
+                if enemy.ball != None:
+                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), enemy.ball.rect)
 
         #pg.image.load('images/bg.jpg')
         #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))

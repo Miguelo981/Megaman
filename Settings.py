@@ -99,7 +99,7 @@ def music(file, state):
 TITLE = "MEGAMAN"
 '''WIDTH = 1000
 HEIGHT = 700'''
-WIDTH = 800 #500,350,       600, 400
+WIDTH = 800 #500,350,       600, 400, 800, 500
 HEIGHT = 500
 FPS = 60
 
