@@ -1,5 +1,6 @@
 # Sprite classes for platform game
 import glob, os
+import random
 
 import pygame as pg
 from Settings import *
@@ -288,6 +289,7 @@ class Omega(pg.sprite.Sprite):
         self.left_hand = Left_hand(self.enemy.x, self.enemy.y, player)
         self.right_hand = Right_hand(self.enemy.x, self.enemy.y, player)
         self.ball = None
+        self.ball2 = None
 
     def update(self):
         self.enemy.update()
@@ -295,15 +297,19 @@ class Omega(pg.sprite.Sprite):
         self.right_hand.update(self.enemy)
         if self.ball != None:
             self.ball.update(True)
+        if self.ball2 != None:
+            self.ball2.update(True)
         if self.enemy.life.constant_dmg == 3:
             self.enemy.assault = True
             self.left_hand.attack()
             if self.enemy.life.w < 60:
                 self.right_hand.attack()
             if self.enemy.life.w < 70:
-                self.ball = Ball()
-        else:
-            self.ball = None
+                self.ball = Ball(self, random.randint(1,6))
+            if self.enemy.life.w < 30:
+                self.ball2 = Ball(self, random.randint(1,6))
+        '''else:
+            self.ball = None'''
         if self.left_hand.rings_number == 3:
             self.enemy.assault = False
 
@@ -453,30 +459,61 @@ class Ring(pg.sprite.Sprite):
             self.rect.x = x+5
 
 class Ball(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, enemy, incx):
         pygame.sprite.Sprite.__init__(self)
         self.image = pygame.image.load(path+r'\images\Bosses\Omega\Ball\1.png')
-        self.rect = self.image.get_rect()
-        self.rect.x = WIDTH / 2
-        self.rect.y = HEIGHT / 2
-        self.speed = [15,15]
+        self.enemy = enemy
+        self.rect = pygame.Rect(self.image.get_rect())
+        self.rect.x = self.enemy.enemy.rect.x+25
+        self.rect.y = self.enemy.enemy.rect.y
         self.attacking = False
+        self.down = True
+        self.incx = incx
+        #self.miniball1 = MiniBall(self)
+        #self.miniball2 = MiniBall(self)
 
     def update(self, state):
         if state:
-            if self.rect.top <= 0:
-                self.speed[1] = -self.speed[1]-5
-            elif self.rect.right >= WIDTH or self.rect.left <= 0:
-                self.speed[0] = -self.speed[0]
-            self.rect.move_ip(self.speed)
-        if self.rect.centerx < WIDTH / 2:  # comprobamos en que lado de la pantalla esta el jugador
-            self.speed = [15, -15]
-        else:  # queremos que la pelota salga hacia su lado
-            self.speed = [-15, -15]
+            #self.miniball1.update()
+            #self.miniball2.update()
+            if self.rect.x > -10 and self.rect.y < 110 and self.down:
+                self.rect.x -= self.incx
+                self.rect.y +=6
+            elif self.rect.x > -10 and self.rect.y > 0 and not self.down:
+                self.rect.x -=self.incx
+                self.rect.y -=6
+            elif self.rect.y >= 110:
+                self.down = False
+            elif self.rect.y < 0:
+                self.down = True
+        if self.rect.x < -10:
+            self.enemy.ball = None
+            self.enemy.ball2 = None
+            #self.miniball1.kill()
+            #self.miniball2.kill()
+            self.kill()
+
+class MiniBall(pygame.sprite.Sprite):
+    def __init__(self, ball):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.image.load(path + r'\images\Bosses\Omega\Ball\1.png')
+        self.ball = ball
+        self.rect = pygame.Rect(self.image.get_rect())
+        self.rect.x = self.ball.rect.x
+        self.rect.y = self.ball.rect.y
+
+    def update(self):
+        if self.ball.down:
+            self.rect.x -= self.ball.incx+2
+            self.rect.y += 5
+        else:
+            self.rect.x -= self.ball.incx+2
+            self.rect.y -= 5
 
 class Boss(Enemy):
     def __init__(self, enemy):
         self.enemy = enemy
+
 
     def update(self):
         pass

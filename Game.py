@@ -70,6 +70,9 @@ class Game:
         if self.collision_player_rings():
             pass #TODO ADD DMG ANIMATION
 
+        if self.collision_player_ball():
+            pass
+
         self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
         self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
@@ -145,6 +148,20 @@ class Game:
                     return True
             if enemy.right_hand.ring != None:
                 if self.player.rect.colliderect(enemy.right_hand.ring):
+                    print("AAAAAAAAAAAAAAH")
+                    self.player.life.quit_life(5)
+                    return True
+        return False
+
+    def collision_player_ball(self):
+        for enemy in self.enemies:
+            if enemy.ball != None:
+                if self.player.rect.colliderect(enemy.ball):
+                    print("AAAAAAAAAAAAAAH")
+                    self.player.life.quit_life(5)
+                    return True
+            if enemy.ball2 != None:
+                if self.player.rect.colliderect(enemy.ball2):
                     print("AAAAAAAAAAAAAAH")
                     self.player.life.quit_life(5)
                     return True
@@ -321,7 +338,12 @@ class Game:
                 if enemy.right_hand.ring != None:
                     self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x, enemy.right_hand.ring.rect.y))
                 if enemy.ball != None:
-                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), enemy.ball.rect)
+                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), (enemy.ball.rect.x, enemy.ball.rect.y))
+                if enemy.ball2 != None:
+                    self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x, enemy.ball2.rect.y))
+                    #self.display.blit(pygame.transform.flip(enemy.ball.miniball1.image, False, False), (enemy.ball.miniball1.rect.x, enemy.ball.miniball1.rect.y))
+                    #self.display.blit(pygame.transform.flip(enemy.ball.miniball2.image, False, False), (enemy.ball.miniball2.rect.x, enemy.ball.miniball2.rect.y))
+
 
         #pg.image.load('images/bg.jpg')
         #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
