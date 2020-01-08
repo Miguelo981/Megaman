@@ -56,10 +56,12 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
         self.shoot_running_sprite = load_images(path + '\images\MM_shoot_moving')
         self.death_sprites = load_images(path + '\images\Megaman\MM_death')
         self.dmg_sprites = load_images(path + '\images\Megaman\MM_dmg')
+        self.charge = Charge(self)
         self.animation_death_counter = 0
         self.shoot = False
         self.shoots = []
         self.animation_dmg_counter = 0
+        self.charging = False
 
     def spawn(self):
             if self.animation_counter > self.animation_cooldown and self.count <= 11:
@@ -85,6 +87,9 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
 
     def update(self):
         self.life.set_clock_player(self.clock)
+        if self.charging:
+            self.charge.set_clock()
+        self.charge.update()
         if self.life.constant_dmg == 1:
             self.dmg()
         else:
@@ -259,6 +264,46 @@ class Bullet(pg.sprite.Sprite):
             self.active = False
         if self.count > 4:
             self.count = 0
+
+class Charge(pg.sprite.Sprite):
+    def __init__(self, player):
+        pg.sprite.Sprite.__init__(self)
+        self.charge1_sprites = load_images(path + '\images\Megaman\MM_charge1')
+        self.player = player
+        self.clock = self.player.clock
+        self.counter = 0
+        self.animation_counter = 0
+        self.img = pg.image.load(self.charge1_sprites[0])
+        self.rect = pygame.Rect(100, 100, 15, 34)
+        self.rect.x = self.player.rect.x / 2
+        self.rect.y = self.player.rect.y / 2
+        self.animation_cooldown = 10
+
+    def set_clock(self):
+        if self.animation_counter > 50:
+            self.counter += 1
+        else:
+            self.animation_counter += self.player.time
+
+    def update(self, *args):
+
+        if self.player.right:
+            self.rect.x = self.player.rect.x+20
+            self.rect.y = self.player.rect.y +2
+        else:
+            self.rect.x = self.player.rect.x - 4
+            self.rect.y = self.player.rect.y + 2
+
+        if self.player.charging and self.counter < len(self.charge1_sprites):
+            self.img = pg.image.load(self.charge1_sprites[self.counter])
+            self.time = 0
+        elif self.counter == len(self.charge1_sprites):
+            self.counter = 0
+            self.time = 0
+
+        if self.animation_counter > self.animation_cooldown:
+            self.counter += 1
+            self.animation_counter = 0
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, life, x, y, w, h, game):

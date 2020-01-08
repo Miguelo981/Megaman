@@ -77,6 +77,8 @@ class Game:
         self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
         self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
+        if self.player.charging:
+            self.display.blit(pygame.transform.flip(self.player.charge.img, False, False), (self.player.charge.rect.x, self.player.charge.rect.y))
         for enemy in self.enemies:
             if enemy.enemy.life.w > 0:
                 self.display.blit(enemy.enemy.life.image, (enemy.enemy.rect.x + 25, enemy.enemy.rect.y - 10))
@@ -282,15 +284,6 @@ class Game:
                 if self.playing:
                     self.playing = False
                 self.running = False
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_z:
-                    self.player.shoot = True
-                if event.key == pg.K_SPACE:
-                    if self.air_timer < 6:
-                        self.vertical_momentum = -5
-                    #self.player.jump()
-                if event.key == pg.K_z:
-                    self.player.counter = 0
             if event.type == pg.KEYUP:
                 if event.key == pg.K_a:
                     self.player.rect = pygame.Rect(self.player.rect.x,self.player.rect.y-10,15,34)
@@ -299,9 +292,21 @@ class Game:
                         bullet = Bullet(self.player)
                         bullet.special = True
                         self.player.shoots.append(bullet)
+                        self.player.charging = False
                     else:
                         self.player.shoots.append(Bullet(self.player))
                         self.player.shoot = False
+                        self.player.charging = False
+
+            if event.type == pg.KEYDOWN:
+                self.player.charging = True
+                if event.key == pg.K_z:
+                    self.player.shoot = True
+                    self.player.counter = 0
+                if event.key == pg.K_SPACE:
+                    if self.air_timer < 6:
+                        self.vertical_momentum = -5
+                    #self.player.jump()
             self.counter += self.time
             #print(self.counter)
 
