@@ -134,6 +134,9 @@ game_map = load_map('map')
 
 grass_img = pygame.image.load('images/blocks/grass.png')
 dirt_img = pygame.image.load('images/blocks/dirt.png')
+metal1_img = pygame.image.load('images/blocks/m1.png')
+metal2_img = pygame.image.load('images/blocks/m2.png')
+metal3_img = pygame.image.load('images/blocks/m3.png')
 background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
 true_scroll = [0,0]
 

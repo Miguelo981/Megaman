@@ -43,6 +43,12 @@ class Game:
                     self.display.blit(dirt_img, (x * 16, y * 16))
                 if tile == '2':
                     self.display.blit(grass_img, (x * 16, y * 16))
+                if tile == '3':
+                    self.display.blit(metal1_img, (x * 16, y * 16))
+                if tile == '4':
+                    self.display.blit(metal2_img, (x * 16, y * 16))
+                if tile == '5':
+                    self.display.blit(metal3_img, (x * 16, y * 16))
                 if tile != '0':
                     self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
                 #self.all_sprites.add(t)
@@ -110,7 +116,8 @@ class Game:
             self.charge_map()
             self.player.set_clock()
             self.clock.tick(FPS)
-            self.events()
+            if self.player.alive:
+                self.events()
             self.update()
             self.draw()
 
@@ -299,8 +306,9 @@ class Game:
                         self.player.charging = False
 
             if event.type == pg.KEYDOWN:
-                self.player.charging = True
                 if event.key == pg.K_z:
+                    if self.player.counter > 100:
+                        self.player.charging = True
                     self.player.shoot = True
                     self.player.counter = 0
                 if event.key == pg.K_SPACE:

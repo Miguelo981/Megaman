@@ -6,6 +6,7 @@ import pygame as pg
 from Settings import *
 vec = pg.math.Vector2
 
+#TODO QUE EL PASILLO DEL FONDO TENGA DOBLE FONOD CON MOVIMIENTO
 
 def load_images(folder_path):
     images = []
@@ -62,6 +63,7 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
         self.shoots = []
         self.animation_dmg_counter = 0
         self.charging = False
+        self.alive = True
 
     def spawn(self):
             if self.animation_counter > self.animation_cooldown and self.count <= 11:
@@ -216,8 +218,8 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
             if self.counter > 100 and self.animation_death_counter < len(self.death_sprites): #TODO ESCOGER OTRO COUNTER
                 self.img = pg.image.load(self.death_sprites[self.animation_death_counter])
                 self.animation_death_counter+=1
-            #else:
-                #self.kill()
+            else:
+                self.alive = False
 
 
 
@@ -280,7 +282,7 @@ class Charge(pg.sprite.Sprite):
         self.animation_cooldown = 10
 
     def set_clock(self):
-        if self.animation_counter > 50:
+        if self.animation_counter > 100:
             self.counter += 1
         else:
             self.animation_counter += self.player.time
@@ -288,11 +290,11 @@ class Charge(pg.sprite.Sprite):
     def update(self, *args):
 
         if self.player.right:
-            self.rect.x = self.player.rect.x+20
-            self.rect.y = self.player.rect.y +2
+            self.rect.x = self.player.rect.x+26
+            self.rect.y = self.player.rect.y +4
         else:
-            self.rect.x = self.player.rect.x - 4
-            self.rect.y = self.player.rect.y + 2
+            self.rect.x = self.player.rect.x - 8
+            self.rect.y = self.player.rect.y +4
 
         if self.player.charging and self.counter < len(self.charge1_sprites):
             self.img = pg.image.load(self.charge1_sprites[self.counter])
@@ -339,7 +341,10 @@ class Enemy(pg.sprite.Sprite):
     def update(self):
         self.life.set_clock(self.clock)
         if self.life.constant_dmg == 3:
-            self.img = pg.image.load(path + '\images\Bosses\Omega\damage.png')
+            if random.randint(1, 6) == 1:
+                self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
+            else:
+                self.img = pg.image.load(path + '\images\Bosses\Omega\damage.png')
             self.life.inmunity()
         else:
             self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
