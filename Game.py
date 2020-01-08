@@ -134,7 +134,6 @@ class Game:
     def collision_player_enemy(self):
         for enemy in self.enemies:
             if self.player.rect.colliderect(enemy.enemy):
-                print("AAAAAAAAAAAAAAH")
                 self.player.life.quit_life(3)
                 return True
         return False
@@ -143,12 +142,10 @@ class Game:
         for enemy in self.enemies:
             if enemy.left_hand.ring != None:
                 if self.player.rect.colliderect(enemy.left_hand.ring):
-                    print("AAAAAAAAAAAAAAH")
                     self.player.life.quit_life(5)
                     return True
             if enemy.right_hand.ring != None:
                 if self.player.rect.colliderect(enemy.right_hand.ring):
-                    print("AAAAAAAAAAAAAAH")
                     self.player.life.quit_life(5)
                     return True
         return False
@@ -157,7 +154,6 @@ class Game:
         for enemy in self.enemies:
             if enemy.ball != None:
                 if self.player.rect.colliderect(enemy.ball):
-                    print("AAAAAAAAAAAAAAH")
                     self.player.life.quit_life(5)
                     return True
             if enemy.ball2 != None:

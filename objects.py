@@ -14,7 +14,7 @@ def load_images(folder_path):
         images.append(folder_path + '/' + files)
     return images
 
-class Player(pg.sprite.Sprite):
+class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
         self.life = Life_Bar("Boss", 6, 42, GREEN)
@@ -54,8 +54,12 @@ class Player(pg.sprite.Sprite):
         self.move_left_sprites = load_images(path+'\images\MM_move_l')
         self.shoot_sprite = load_images(path+'\images\MM_shoot')
         self.shoot_running_sprite = load_images(path + '\images\MM_shoot_moving')
+        self.death_sprites = load_images(path + '\images\Megaman\MM_death')
+        self.dmg_sprites = load_images(path + '\images\Megaman\MM_dmg')
+        self.animation_death_counter = 0
         self.shoot = False
         self.shoots = []
+        self.animation_dmg_counter = 0
 
     def spawn(self):
             if self.animation_counter > self.animation_cooldown and self.count <= 11:
@@ -80,112 +84,137 @@ class Player(pg.sprite.Sprite):
         #print(self.counter)
 
     def update(self):
-        if self.life.h <= 0:
-            print("muerto")
-        #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
-        self.acc = vec(0, PLAYER_GRAV)
-        keys = pg.key.get_pressed()
-        if self.vel.x >= 0 and self.vel.x < 1 or self.vel.x > -1 and self.vel.x <= 0:
-            self.moving = False
-            self.count = 0
-
-        if self.count == 4 and self.shoot and not self.moving:
-            self.count = 0
-
-        if self.count == 8 and self.moving:
-            self.count = 0
-
-        if self.shoot:
-            if not self.moving:
-                self.img = pg.image.load(self.shoot_sprite[self.count])
-            elif self.moving:
-                self.img = pg.image.load(self.shoot_running_sprite[self.count])
-
-        if self.moving:
-            if not self.shoot:
-                self.image = pg.image.load(self.move_right_sprites[self.count])
-                self.img = pg.image.load(self.move_right_sprites[self.count])
-                #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
-            '''elif not self.shoot:
-                self.image = pg.image.load(self.move_left_sprites[self.count])
-                self.img = pg.image.load(self.move_left_sprites[self.count])
-                #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)'''
+        self.life.set_clock_player(self.clock)
+        if self.life.constant_dmg == 1:
+            self.dmg()
         else:
-            self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
-            #print(self.rect.x)
-            if not self.shoot:
-                self.image = pg.image.load(path+'\images\MM_WS.png')
-                self.img = pg.image.load(path + '\images\MM_WS.png')
-            elif not self.shoot:
-                self.image = pg.image.load(path + '\images\MM_WS_l.png')
-                self.img = pg.image.load(path + '\images\MM_WS_l.png')
-            elif self.shoot_sprite:
-                self.img = pg.image.load(self.shoot_sprite[self.count])
+            self.animation_dmg_counter = 0
+        if self.life.h <= 0:
+            self.death()
+        else:
+            #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
+            self.acc = vec(0, PLAYER_GRAV)
+            keys = pg.key.get_pressed()
+            if self.vel.x >= 0 and self.vel.x < 1 or self.vel.x > -1 and self.vel.x <= 0:
+                self.moving = False
+                self.count = 0
 
-        if self.animation_counter > self.animation_cooldown:
-            self.count += 1
-            self.animation_counter = 0
+            if self.count == 4 and self.shoot and not self.moving:
+                self.count = 0
 
-        if keys[pg.K_LEFT] and not self.collide:
-            self.acc.x = -PLAYER_ACC
-            self.rect.x -= 3
-            self.right = False
-            self.moving = True
-        if keys[pg.K_RIGHT] and not self.collide:
-            self.acc.x = PLAYER_ACC
-            self.rect.x += 3
-            self.right = True
-            self.moving = True
-        #TODO CONTROL DEL DASH
-        if keys[pg.K_a] and keys[pg.K_LEFT]:
-            self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
-            self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
-            self.right = False
-            if self.counter > self.cooldown:
+            if self.count == 8 and self.moving:
+                self.count = 0
+
+            if self.shoot:
+                if not self.moving:
+                    self.img = pg.image.load(self.shoot_sprite[self.count])
+                elif self.moving:
+                    self.img = pg.image.load(self.shoot_running_sprite[self.count])
+
+            if self.moving:
+                if not self.shoot:
+                    self.image = pg.image.load(self.move_right_sprites[self.count])
+                    self.img = pg.image.load(self.move_right_sprites[self.count])
+                    #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
+                '''elif not self.shoot:
+                    self.image = pg.image.load(self.move_left_sprites[self.count])
+                    self.img = pg.image.load(self.move_left_sprites[self.count])
+                    #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)'''
+            else:
+                self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
+                #print(self.rect.x)
+                if not self.shoot:
+                    self.image = pg.image.load(path+'\images\MM_WS.png')
+                    self.img = pg.image.load(path + '\images\MM_WS.png')
+                elif not self.shoot:
+                    self.image = pg.image.load(path + '\images\MM_WS_l.png')
+                    self.img = pg.image.load(path + '\images\MM_WS_l.png')
+                elif self.shoot_sprite:
+                    self.img = pg.image.load(self.shoot_sprite[self.count])
+
+            if self.animation_counter > self.animation_cooldown:
+                self.count += 1
+                self.animation_counter = 0
+
+            if keys[pg.K_LEFT] and not self.collide:
+                self.acc.x = -PLAYER_ACC
+                self.rect.x -= 3
+                self.right = False
                 self.moving = True
-                for i in range(1,5):
-                    self.vel.x -= 0.75
-                    hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-                    if hits:
+            if keys[pg.K_RIGHT] and not self.collide:
+                self.acc.x = PLAYER_ACC
+                self.rect.x += 3
+                self.right = True
+                self.moving = True
+            #TODO CONTROL DEL DASH
+            if keys[pg.K_a] and keys[pg.K_LEFT]:
+                self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
+                self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
+                self.right = False
+                if self.counter > self.cooldown:
+                    self.moving = True
+                    for i in range(1,5):
                         self.vel.x -= 0.75
-                    #self.acc.x = -PLAYER_ACC
-                    #self.pos.x -= 1
-                self.counter = 0
-                #self.vel.x = 0
+                        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                        if hits:
+                            self.vel.x -= 0.75
+                        #self.acc.x = -PLAYER_ACC
+                        #self.pos.x -= 1
+                    self.counter = 0
+                    #self.vel.x = 0
 
-        if keys[pg.K_a] and keys[pg.K_RIGHT]:
-            self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
-            self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
-            self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
-            #self.rect = pygame.Rect(self.image.get_rect())
-            self.moving = True
-            if self.counter > self.cooldown:
-                for i in range(1, 5):
-                    self.vel.x += 1.5
-                    self.pos.x += 1.5
-                    #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-                    #if hits:
-                        #self.vel.x += 0.75
-                self.counter = 0
+            if keys[pg.K_a] and keys[pg.K_RIGHT]:
+                self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
+                self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
+                self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
+                #self.rect = pygame.Rect(self.image.get_rect())
+                self.moving = True
+                if self.counter > self.cooldown:
+                    for i in range(1, 5):
+                        self.vel.x += 1.5
+                        self.pos.x += 1.5
+                        #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                        #if hits:
+                            #self.vel.x += 0.75
+                    self.counter = 0
 
-        if not self.collide:
-            # apply friction
-            self.acc.x += self.vel.x * PLAYER_FRICTION
-            # equations of motion
-            self.vel += self.acc
-            #self.pos += self.vel + 0.5 * self.acc
-            # wrap around the sides of the screen
-        if self.rect.x > WIDTH:
-            self.rect.x = WIDTH
-        if self.rect.x < 0:
-            self.rect.x = 0
+            if not self.collide:
+                # apply friction
+                self.acc.x += self.vel.x * PLAYER_FRICTION
+                # equations of motion
+                self.vel += self.acc
+                #self.pos += self.vel + 0.5 * self.acc
+                # wrap around the sides of the screen
+            if self.rect.x > WIDTH:
+                self.rect.x = WIDTH
+            if self.rect.x < 0:
+                self.rect.x = 0
 
-        if self.pos.x > WIDTH:
-            self.pos.x = WIDTH
-        if self.pos.x < 0:
-            self.pos.x = 0
+            if self.pos.x > WIDTH:
+                self.pos.x = WIDTH
+            if self.pos.x < 0:
+                self.pos.x = 0
 
-        #self.rect.midbottom = self.pos
+            #self.rect.midbottom = self.pos
+
+    def dmg(self):
+        if self.animation_dmg_counter < len(self.dmg_sprites):
+            self.img = pg.image.load(self.dmg_sprites[self.animation_dmg_counter])
+            self.animation_dmg_counter+=1
+
+    def death(self):
+        if self.life.h <= 0:
+            self.able_to_move = False
+            if self.animation_death_counter == 0:
+                self.img = pg.image.load(self.shoot_sprite[self.animation_death_counter])
+                print(self.counter)
+            if self.counter > 100 and self.animation_death_counter < len(self.death_sprites): #TODO ESCOGER OTRO COUNTER
+                self.img = pg.image.load(self.death_sprites[self.animation_death_counter])
+                self.animation_death_counter+=1
+            #else:
+                #self.kill()
+
+
 
 class Bullet(pg.sprite.Sprite):
     def __init__(self, player):
@@ -306,8 +335,8 @@ class Omega(pg.sprite.Sprite):
                 self.right_hand.attack()
             if self.enemy.life.w < 70:
                 self.ball = Ball(self, random.randint(1,6))
-            if self.enemy.life.w < 30:
-                self.ball2 = Ball(self, random.randint(1,6))
+            if self.enemy.life.w < 30 and self.ball.rect.x < self.enemy.rect.x-30:
+                self.ball2 = Ball(self, self.ball.incx)
         '''else:
             self.ball = None'''
         if self.left_hand.rings_number == 3:
@@ -452,6 +481,9 @@ class Ring(pg.sprite.Sprite):
         self.img = None
         self.rect = pygame.Rect(rect)
         self.rect.x = x
+        #pygame.mixer.pre_init(44100, 16, 2, 4096)
+        #pygame.init()
+        pygame.mixer.Sound.play(pygame.mixer.Sound(path + r'\images\Bosses\Omega\Rings.wav'))
         if y < 50:
             self.rect.y = y+20
         else:
@@ -466,9 +498,9 @@ class Ball(pygame.sprite.Sprite):
         self.rect = pygame.Rect(self.image.get_rect())
         self.rect.x = self.enemy.enemy.rect.x+25
         self.rect.y = self.enemy.enemy.rect.y
-        self.attacking = False
         self.down = True
         self.incx = incx
+        #pygame.mixer.Sound(path+r'\images\Bosses\Omega\ball.mp3')
         #self.miniball1 = MiniBall(self)
         #self.miniball2 = MiniBall(self)
 
@@ -484,7 +516,7 @@ class Ball(pygame.sprite.Sprite):
                 self.rect.y -=6
             elif self.rect.y >= 110:
                 self.down = False
-            elif self.rect.y < 0:
+            elif self.rect.y <= 0:
                 self.down = True
         if self.rect.x < -10:
             self.enemy.ball = None
@@ -518,7 +550,6 @@ class Boss(Enemy):
     def update(self):
         pass
 
-#TODO QUE LAS BARRAS DE LOS NO-BOSSES SIGA AL ENEMIGO EN LA CABEZA
 class Life_Bar(pg.sprite.Sprite):
     def __init__(self, type, w, h, color): #max_life
         pg.sprite.Sprite.__init__(self)
@@ -531,7 +562,7 @@ class Life_Bar(pg.sprite.Sprite):
         #self.rect = pygame.Rect(0, 0, w, h)
         self.background = pg.Surface((self.w, self.h))
         self.background.fill(DARK)
-        self.image = pg.Surface((self.w, self.h))
+        self.image = pg.Surface((self.w, self.h)).convert()
         self.image.fill(self.color)
         self.rect = pygame.Rect(0, 0, self.w, self.h)
         self.rect.x = 5
@@ -541,6 +572,11 @@ class Life_Bar(pg.sprite.Sprite):
         self.counter = 0
         self.time = 0
 
+    def set_clock_player(self, clock):
+        if self.constant_dmg == 1:
+            self.time = clock.tick()
+            self.counter += self.time
+
     def set_clock(self, clock):
         if self.constant_dmg == 3:
             self.time = clock.tick()
@@ -549,9 +585,20 @@ class Life_Bar(pg.sprite.Sprite):
     def update(self):
         pass
 
+    def inmunity_player(self):
+        if self.constant_dmg == 1:
+            if self.counter > 0: #5
+                self.constant_dmg = 0
+                self.counter = 0
+                return False
+            else:
+                return True
+        else:
+            return False
+
     def inmunity(self):
         if self.constant_dmg == 3:
-            if self.counter > 15:
+            if self.counter > 100:
                 self.constant_dmg = 0
                 self.counter = 0
                 return False
@@ -561,11 +608,13 @@ class Life_Bar(pg.sprite.Sprite):
             return False
 
     def quit_life(self, life):
-        self.h -= life
-        if self.h < 0:
-            self.h = 0
-        self.image = pg.Surface((self.w, self.h))
-        self.image.fill(self.color)
+        if not self.inmunity_player():
+            self.h -= life
+            self.constant_dmg +=1
+            if self.h < 0:
+                self.h = 0
+            self.image = pg.Surface((self.w, self.h))
+            self.image.fill(self.color)
 
     def quit_enemy_life(self, life):
         if not self.inmunity():
