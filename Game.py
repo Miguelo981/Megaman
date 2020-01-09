@@ -1,21 +1,23 @@
 from encodings.punycode import selective_find
 
 import pygame as pg
+import pygame
 import random
 from Settings import *
 from objects import *
+import Settings
 
 class Game:
     def __init__(self):
         # initialize game window, etc
         pg.init()
         pg.mixer.init()
-        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        self.screen = pg.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
         self.display = pg.Surface((275, 150)) #300 200
         #self.display.fill((255,255,255))
         #self.background = pygame.image.load("images/bg.jpg")
         #self.display.blit(self.background, (0,0))
-        pg.display.set_caption(TITLE)
+        pg.display.set_caption(Settings.TITLE)
         self.clock = pg.time.Clock()
         self.running = True
         self.vertical_momentum = 0
@@ -40,15 +42,15 @@ class Game:
             x = 0
             for tile in layer:
                 if tile == '1':
-                    self.display.blit(dirt_img, (x * 16, y * 16))
+                    self.display.blit(Settings.dirt_img, (x * 16, y * 16))
                 if tile == '2':
-                    self.display.blit(grass_img, (x * 16, y * 16))
+                    self.display.blit(Settings.grass_img, (x * 16, y * 16))
                 if tile == '3':
-                    self.display.blit(metal1_img, (x * 16, y * 16))
+                    self.display.blit(Settings.metal1_img, (x * 16, y * 16))
                 if tile == '4':
-                    self.display.blit(metal2_img, (x * 16, y * 16))
+                    self.display.blit(Settings.metal2_img, (x * 16, y * 16))
                 if tile == '5':
-                    self.display.blit(metal3_img, (x * 16, y * 16))
+                    self.display.blit(Settings.metal3_img, (x * 16, y * 16))
                 if tile != '0':
                     self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
                 #self.all_sprites.add(t)
@@ -116,8 +118,7 @@ class Game:
             self.charge_map()
             self.player.set_clock()
             self.clock.tick(FPS)
-            if self.player.alive:
-                self.events()
+            self.events()
             self.update()
             self.draw()
 
@@ -249,8 +250,8 @@ class Game:
                 #self.player.vel.y = 0
                 #print(self.player.pos.y)
         self.player.collide = False
-        if self.player.rect.y > HEIGHT:
-            self.player.rect = pg.Rect(100,100, WIDTH / 2, HEIGHT / 2)
+        if self.player.rect.y > Settings.HEIGHT:
+            self.player.rect = pg.Rect(100,100, Settings.WIDTH / 2, Settings.HEIGHT / 2)
             #self.player.kill()
 
     def collision_test(self, tiles):
@@ -287,34 +288,39 @@ class Game:
         # Game Loop - events
         for event in pg.event.get():
             # check for closing window
-            if event.type == pg.QUIT:
-                if self.playing:
-                    self.playing = False
-                self.running = False
-            if event.type == pg.KEYUP:
-                if event.key == pg.K_a:
-                    self.player.rect = pygame.Rect(self.player.rect.x,self.player.rect.y-10,15,34)
-                if event.key == pg.K_z and self.player.shoot:
-                    if self.player.counter > 350:
-                        bullet = Bullet(self.player)
-                        bullet.special = True
-                        self.player.shoots.append(bullet)
-                        self.player.charging = False
-                    else:
-                        self.player.shoots.append(Bullet(self.player))
-                        self.player.shoot = False
-                        self.player.charging = False
+            if self.player.alive:
+                if event.type == pg.QUIT:
+                    if self.playing:
+                        self.playing = False
+                    self.running = False
+                if event.type == pg.KEYUP:
+                    if event.key == pg.K_a:
+                        self.player.rect = pygame.Rect(self.player.rect.x,self.player.rect.y-10,15,34)
+                    if event.key == pg.K_z and self.player.shoot:
+                        if self.player.counter > 350:
+                            bullet = Bullet(self.player)
+                            bullet.special = True
+                            self.player.shoots.append(bullet)
+                            self.player.charging = False
+                        else:
+                            self.player.shoots.append(Bullet(self.player))
+                            self.player.shoot = False
+                            self.player.charging = False
 
-            if event.type == pg.KEYDOWN:
-                if event.key == pg.K_z:
-                    if self.player.counter > 100:
-                        self.player.charging = True
-                    self.player.shoot = True
-                    self.player.counter = 0
-                if event.key == pg.K_SPACE:
-                    if self.air_timer < 6:
-                        self.vertical_momentum = -5
-                    #self.player.jump()
+                if event.type == pg.KEYDOWN:
+                    if event.key == pg.K_z:
+                        if self.player.counter > 100:
+                            self.player.charging = True
+                        self.player.shoot = True
+                        self.player.counter = 0
+                    if event.key == pg.K_SPACE:
+                        if self.air_timer < 6:
+                            self.vertical_momentum = -5
+                        #self.player.jump()
+            else:
+                if event.key:
+                    import Settings
+                    Settings.main_menu()
             self.counter += self.time
             #print(self.counter)
 
@@ -323,9 +329,9 @@ class Game:
         #self.screen.fill(BLACK)
         #self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
-        screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
-        pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(WIDTH, HEIGHT, WIDTH, HEIGHT))
-        pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, WIDTH, HEIGHT))
+        screen.blit(pygame.transform.scale(self.display, (Settings.WIDTH, Settings.HEIGHT)), (0, 0))
+        pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(Settings.WIDTH, Settings.HEIGHT, Settings.WIDTH, Settings.HEIGHT))
+        pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, Settings.WIDTH, Settings.HEIGHT))
         for background_object in background_objects:
             obj_rect = pygame.Rect(background_object[1][0] - self.player.rect.x * background_object[0],
                                    background_object[1][1] - self.player.rect.y * background_object[0], background_object[1][2],
@@ -367,10 +373,10 @@ class Game:
         # game over/continue
         pass
 
-g = Game()
-g.show_start_screen()
-while g.running:
-    g.new()
-    g.show_go_screen()
-
-pg.quit()
+def init_game():
+    g = Game()
+    g.show_start_screen()
+    while g.running:
+        g.new()
+        g.show_go_screen()
+    pygame.quit()

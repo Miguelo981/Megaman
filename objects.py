@@ -3,7 +3,9 @@ import glob, os
 import random
 
 import pygame as pg
+import pygame, Settings
 from Settings import *
+import Settings
 vec = pg.math.Vector2
 
 #TODO QUE EL PASILLO DEL FONDO TENGA DOBLE FONOD CON MOVIMIENTO

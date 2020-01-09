@@ -1,5 +1,4 @@
-import pygame
-import sys, os
+import pygame, sys, os
 
 def main_menu():
     menu = True
@@ -27,11 +26,12 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         print("Start")
-                        music('music/vs_omega.mp3', True)
+                        music(path+r'/music/vs_omega.mp3', True)
                         #####music(song, False)
                         #import Stage
                         #####music('music/stage_1.mp3', True)
                         import Game
+                        Game.init_game()
                     if selected == "controls":
                         print("Controls")
                         #stage = Stage()
@@ -45,7 +45,7 @@ def main_menu():
                 #megaman.update(event)
 
         # Main Menu UI
-        filename = 'images/Megaman-background.png'
+        filename = path+'/images/Megaman-background.png'
         #filename = screen.fill((255,255,255))
         image = pygame.image.load(filename)
         screen.blit(image, (0,0))
@@ -96,6 +96,7 @@ def music(file, state):
         pygame.mixer.stop()
 
 # game options/settings
+path = os.getcwd()
 TITLE = "MEGAMAN"
 '''WIDTH = 1000
 HEIGHT = 700'''
@@ -107,8 +108,8 @@ FPS = 60
 PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.8
-ICON = "images/megaman_exe_navi.png"
-FONT = "fonts/Mega-Man-Battle-Network.ttf"
+ICON = path+"/images/megaman_exe_navi.png"
+FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
 FPS = 60
 
 # Starting platforms
@@ -132,11 +133,11 @@ def load_map(path):
 
 game_map = load_map('map')
 
-grass_img = pygame.image.load('images/blocks/grass.png')
-dirt_img = pygame.image.load('images/blocks/dirt.png')
-metal1_img = pygame.image.load('images/blocks/m1.png')
-metal2_img = pygame.image.load('images/blocks/m2.png')
-metal3_img = pygame.image.load('images/blocks/m3.png')
+grass_img = pygame.image.load(path+'/images/blocks/grass.png')
+dirt_img = pygame.image.load(path+'/images/blocks/dirt.png')
+metal1_img = pygame.image.load(path+'/images/blocks/m1.png')
+metal2_img = pygame.image.load(path+'/images/blocks/m2.png')
+metal3_img = pygame.image.load(path+'/images/blocks/m3.png')
 background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
 true_scroll = [0,0]
 
@@ -150,7 +151,6 @@ YELLOW = (255, 255, 0)
 LIGHTBLUE = (0, 155, 155)
 GOLD = (249, 166, 2)
 DARK = (7, 7, 23)
-path = os.getcwd()
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
