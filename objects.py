@@ -114,32 +114,35 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
             if self.count == 8 and self.moving:
                 self.count = 0
 
-            if self.shoot:
-                if not self.moving:
-                    self.img = pg.image.load(self.shoot_sprite[self.count])
-                elif self.moving:
-                    self.img = pg.image.load(self.shoot_running_sprite[self.count])
+            if self.life.inmunity_player() and random.randint(1, 4) == 1:
+                self.img = pg.image.load(path + '\images\Megaman\MM_WS_invisible.png')
+            else:
+                if self.shoot:
+                    if not self.moving:
+                        self.img = pg.image.load(self.shoot_sprite[self.count])
+                    elif self.moving:
+                        self.img = pg.image.load(self.shoot_running_sprite[self.count])
 
-            if self.moving:
-                if not self.shoot:
-                    self.image = pg.image.load(self.move_right_sprites[self.count])
-                    self.img = pg.image.load(self.move_right_sprites[self.count])
-                    #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
-                '''elif not self.shoot:
-                    self.image = pg.image.load(self.move_left_sprites[self.count])
+                if self.moving:
+                    if not self.shoot:
+                        self.image = pg.image.load(self.move_right_sprites[self.count])
+                        self.img = pg.image.load(self.move_right_sprites[self.count])
+                        #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
+                    '''elif not self.shoot:
+                        self.image = pg.image.load(self.move_left_sprites[self.count])
                     self.img = pg.image.load(self.move_left_sprites[self.count])
                     #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)'''
-            else:
-                self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
-                #print(self.rect.x)
-                if not self.shoot:
-                    self.image = pg.image.load(path+'\images\MM_WS.png')
-                    self.img = pg.image.load(path + '\images\MM_WS.png')
-                elif not self.shoot:
-                    self.image = pg.image.load(path + '\images\MM_WS_l.png')
-                    self.img = pg.image.load(path + '\images\MM_WS_l.png')
-                elif self.shoot_sprite:
-                    self.img = pg.image.load(self.shoot_sprite[self.count])
+                else:
+                    self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
+                    #print(self.rect.x)
+                    if not self.shoot:
+                        self.image = pg.image.load(path+'\images\MM_WS.png')
+                        self.img = pg.image.load(path + '\images\MM_WS.png')
+                    elif not self.shoot:
+                        self.image = pg.image.load(path + '\images\MM_WS_l.png')
+                        self.img = pg.image.load(path + '\images\MM_WS_l.png')
+                    elif self.shoot_sprite:
+                        self.img = pg.image.load(self.shoot_sprite[self.count])
 
             if self.animation_counter > self.animation_cooldown:
                 self.count += 1
