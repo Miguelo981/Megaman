@@ -9,6 +9,7 @@ import Settings
 vec = pg.math.Vector2
 
 #TODO QUE EL PASILLO DEL FONDO TENGA DOBLE FONOD CON MOVIMIENTO
+#TODO SI MUERES ANTES QUE EL BOSS, CANCELAR BULLETS / ENEMY INVENCIBILITY
 
 def load_images(folder_path):
     images = []
