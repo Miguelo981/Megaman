@@ -12,7 +12,9 @@ class Game:
         # initialize game window, etc
         pg.init()
         pg.mixer.init()
-        self.screen = pg.display.set_mode((Settings.WIDTH, Settings.HEIGHT))
+        self.screen = pg.display.set_mode((WIDTH, HEIGHT))
+        #self.screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
+        #self.screen.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
         self.display = pg.Surface((275, 150)) #300 200
         #self.display.fill((255,255,255))
         #self.background = pygame.image.load("images/bg.jpg")
@@ -65,12 +67,16 @@ class Game:
 
         collisions = self.move(self.tile_rects)
 
-        if collisions['bottom'] == True:
+        if collisions['bottom'] == True and self.player.alive:
             self.air_timer = 0
             self.vertical_momentum = 0
+            self.player.air = False
             #self.player.rect.y = 0
         else:
+            self.player.air = True
             self.air_timer += 1
+            if not self.player.shoot:
+                self.player.img = pg.image.load(path + r'\images\Megaman\MM_jump\1.png')
 
         if self.collision_player_enemy_wall():
             self.player.rect.x = self.player.rect.x-4
@@ -351,8 +357,14 @@ class Game:
             else:
                 pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
         #image = pygame.transform.scale(pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), (300, 200))
+        #pygame.draw.rect(self.display, pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), pg.Rect(self.player.rect.x *0.5, self.player.rect.y * 0.5, 276, 159))
         image = pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png')
-        self.display.blit(image, image.get_rect())
+        image = pg.image.load(path + r'\images\maps\background1.png')
+        pillar = pg.image.load(path + r'\images\maps\pillars.png')
+
+        self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
+        self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
+
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":
                 self.display.blit(pygame.transform.flip(enemy.left_hand.img, enemy.left_hand.left, False),(enemy.left_hand.rect.x, enemy.left_hand.rect.y))

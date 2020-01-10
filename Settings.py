@@ -45,7 +45,7 @@ def main_menu():
                 #megaman.update(event)
 
         # Main Menu UI
-        filename = path+'/images/Megaman-background.png'
+        filename = path+'/images/Megaman-background2.png'
         #filename = screen.fill((255,255,255))
         image = pygame.image.load(filename)
         screen.blit(image, (0,0))
@@ -71,9 +71,9 @@ def main_menu():
         quit_rect = text_quit.get_rect()
 
         # Main Menu Text
-        screen.blit(text_start, (WIDTH / 1.5 - (start_rect[2] / 2), 300))
-        screen.blit(text_controls, (WIDTH / 1.5 - (controls_rect[2] / 2), 400))
-        screen.blit(text_quit, (WIDTH / 1.5 - (quit_rect[2] / 2), 500))
+        screen.blit(text_start, (WIDTH / 1.5 - (start_rect[2] / 2), 200))
+        screen.blit(text_controls, (WIDTH / 1.5 - (controls_rect[2] / 2), 300))
+        screen.blit(text_quit, (WIDTH / 1.5 - (quit_rect[2] / 2), 400))
 
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
@@ -110,6 +110,7 @@ PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.8
 ICON = path+"/images/megaman_exe_navi.png"
 FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
+name = "\Megaman"
 FPS = 60
 
 # Starting platforms

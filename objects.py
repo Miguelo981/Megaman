@@ -53,13 +53,14 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
         self.count = 0
         self.time = clock.tick()
         self.collide = False
-        self.spawn_sprites = load_images(path + '\images\MM_spawn')
-        self.move_right_sprites = load_images(path+'\images\MM_move_r')
-        self.move_left_sprites = load_images(path+'\images\MM_move_l')
-        self.shoot_sprite = load_images(path+'\images\MM_shoot')
-        self.shoot_running_sprite = load_images(path + '\images\MM_shoot_moving')
-        self.death_sprites = load_images(path + '\images\Megaman\MM_death')
-        self.dmg_sprites = load_images(path + '\images\Megaman\MM_dmg')
+        #self.spawn_sprites = load_images(path + r"\images\""+name+"\MM_spawn")
+        self.move_right_sprites = load_images(path+r"\images"+name+"\MM_move_r")
+        self.move_left_sprites = load_images(path+r"\images"+name+"\MM_move_l")
+        self.shoot_sprite = load_images(path+r"\images"+name+"\MM_shoot")
+        self.shoot_jump = load_images(path + r"\images"+name+"\MM_jump_shoot")
+        self.shoot_running_sprite = load_images(path + r"\images"+name+"\MM_shoot_moving")
+        self.death_sprites = load_images(path + r"\images"+name+"\MM_death")
+        self.dmg_sprites = load_images(path + r"\images"+name+"\MM_dmg")
         self.charge = Charge(self)
         self.animation_death_counter = 0
         self.shoot = False
@@ -67,6 +68,7 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
         self.animation_dmg_counter = 0
         self.charging = False
         self.alive = True
+        self.air = False
 
     def spawn(self):
             if self.animation_counter > self.animation_cooldown and self.count <= 11:
@@ -109,18 +111,20 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
                 self.moving = False
                 self.count = 0
 
-            if self.count == 4 and self.shoot and not self.moving:
+            if self.count == 4 and self.shoot and not self.moving or self.air:
                 self.count = 0
 
             if self.count == 8 and self.moving:
                 self.count = 0
 
             if self.life.inmunity_player() and random.randint(1, 4) == 1:
-                self.img = pg.image.load(path + '\images\Megaman\MM_WS_invisible.png')
+                self.img = pg.image.load(path + r"\images"+name+"\MM_WS_invisible.png")
             else:
                 if self.shoot:
-                    if not self.moving:
+                    if not self.moving and not self.air:
                         self.img = pg.image.load(self.shoot_sprite[self.count])
+                    elif self.air:
+                        self.img = pg.image.load(self.shoot_jump[self.count])
                     elif self.moving:
                         self.img = pg.image.load(self.shoot_running_sprite[self.count])
 
@@ -137,11 +141,11 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
                     self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
                     #print(self.rect.x)
                     if not self.shoot:
-                        self.image = pg.image.load(path+'\images\MM_WS.png')
-                        self.img = pg.image.load(path + '\images\MM_WS.png')
+                        #self.image = pg.image.load(path+r"\images"+name+"\MM_WS.png")
+                        self.img = pg.image.load(path + r"\images"+name+"\MM_WS.png")
                     elif not self.shoot:
-                        self.image = pg.image.load(path + '\images\MM_WS_l.png')
-                        self.img = pg.image.load(path + '\images\MM_WS_l.png')
+                        #self.image = pg.image.load(path + r"\images"+name+"\MM_WS_l.png")
+                        self.img = pg.image.load(path + r"\images"+name+"\MM_WS_l.png")
                     elif self.shoot_sprite:
                         self.img = pg.image.load(self.shoot_sprite[self.count])
 
@@ -161,31 +165,33 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
                 self.moving = True
             #TODO CONTROL DEL DASH
             if keys[pg.K_a] and keys[pg.K_LEFT]:
-                self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
+                self.img = pg.image.load(path + r"\images"+name+"\MM_WS_dash_1.png")
                 self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
+                #self.rect = pygame.Rect(self.img.get_rect())
                 self.right = False
                 if self.counter > self.cooldown:
                     self.moving = True
                     for i in range(1,5):
-                        self.vel.x -= 0.75
-                        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-                        if hits:
-                            self.vel.x -= 0.75
+                        self.rect.x -= 1
+                        #self.vel.x -= 0.75
+                        #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
+                        #if hits:
+                            #self.vel.x -= 0.75
                         #self.acc.x = -PLAYER_ACC
                         #self.pos.x -= 1
                     self.counter = 0
                     #self.vel.x = 0
 
             if keys[pg.K_a] and keys[pg.K_RIGHT]:
-                self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
-                self.img = pg.image.load(path + '\images\MM_WS_dash_1.png')
+                #self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
+                self.img = pg.image.load(path + r"\images"+name+"\MM_WS_dash_1.png")
                 self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
-                #self.rect = pygame.Rect(self.image.get_rect())
+                #self.rect = pygame.Rect(self.img.get_rect())
                 self.moving = True
                 if self.counter > self.cooldown:
                     for i in range(1, 5):
-                        self.vel.x += 1.5
-                        self.pos.x += 1.5
+                        #self.vel.x += 1.5
+                        self.pos.x += 1
                         #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
                         #if hits:
                             #self.vel.x += 0.75
@@ -247,11 +253,11 @@ class Bullet(pg.sprite.Sprite):
         self.active = True
         self.count = 0
         if not self.special:
-            self.img = pg.image.load(path + r'\images\Megaman\MM_bullet\1.png')
+            self.img = pg.image.load(path + r"\images"+name+r"\MM_bullet\1.png")
             self.rect.y = player.rect.y + 8
         else:
             self.rect.y = player.rect.y + 4
-        self.shoot_sprites = load_images(path + '\images\MM_shoot_1')
+        self.shoot_sprites = load_images(path + r"\images"+name+"\MM_shoot_1")
 
         #self.spawn_sprites = load_images(self.path + '\images\shoot')
 
@@ -282,7 +288,7 @@ class Bullet(pg.sprite.Sprite):
 class Charge(pg.sprite.Sprite):
     def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
-        self.charge1_sprites = load_images(path + '\images\Megaman\MM_charge1')
+        self.charge1_sprites = load_images(path + r"\images"+name+"\MM_charge1")
         self.player = player
         self.clock = self.player.clock
         self.counter = 0
