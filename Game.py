@@ -72,6 +72,9 @@ class Game:
         else:
             self.air_timer += 1
 
+        if self.collision_player_enemy_wall():
+            self.player.rect.x = self.player.rect.x-4
+
         if self.collision_player_enemy():
             pass
 
@@ -147,6 +150,13 @@ class Game:
                 self.player.life.quit_life(3)
                 return True
         return False
+
+    def collision_player_enemy_wall(self):
+        for enemy in self.enemies:
+            if self.player.rect.colliderect(enemy.invisibleWall):
+                return True
+        return False
+
 
     def collision_player_rings(self):
         for enemy in self.enemies:

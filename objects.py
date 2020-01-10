@@ -240,14 +240,19 @@ class Bullet(pg.sprite.Sprite):
             self.rect.x = player.rect.x+24
         else:
             self.rect.x = player.rect.x-24
-        self.rect.y = player.rect.y+4
         self.init_rect = self.rect.x
         #self.img = pg.image.load(r'Megaman\images\blocks\grass.png')
         self.right = player.right
         self.special = False
         self.active = True
         self.count = 0
+        if not self.special:
+            self.img = pg.image.load(path + r'\images\Megaman\MM_bullet\1.png')
+            self.rect.y = player.rect.y + 8
+        else:
+            self.rect.y = player.rect.y + 4
         self.shoot_sprites = load_images(path + '\images\MM_shoot_1')
+
         #self.spawn_sprites = load_images(self.path + '\images\shoot')
 
     def set_clock(self):
@@ -256,7 +261,8 @@ class Bullet(pg.sprite.Sprite):
         self.animation_counter += self.time
 
     def update(self):
-        self.img = pg.image.load(self.shoot_sprites[self.count])
+        if self.special:
+            self.img = pg.image.load(self.shoot_sprites[self.count])
 
         '''if self.animation_counter > self.animation_cooldown:
             self.count += 1
@@ -375,6 +381,7 @@ class Omega(pg.sprite.Sprite):
         self.right_hand = Right_hand(self.enemy.x, self.enemy.y, player)
         self.ball = None
         self.ball2 = None
+        self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)
 
     def update(self):
         self.enemy.update()
@@ -700,3 +707,14 @@ class Platform(pg.sprite.Sprite):
         self.rect.x = x
         self.rect.y = y
         self.main = main
+
+class InivisbleWall(pg.sprite.Sprite):
+    def __init__(self, x, y, w, h):
+        pg.sprite.Sprite.__init__(self)
+        self.h = h
+        self.w = w
+        self.image = pg.Surface((self.w, self.h))
+        self.image.fill(WHITE)
+        self.rect = pygame.Rect(x, y, self.w, self.h)
+        self.rect.x = x
+        self.rect.y = y
