@@ -334,11 +334,11 @@ class Game:
                             self.vertical_momentum = -5
                         #self.player.jump()
             else:
+                music(path+r'/music/vs_omega.mp3', False)
                 if event.key:
                     import Settings
                     Settings.main_menu()
             self.counter += self.time
-            #print(self.counter)
 
     def draw(self):
         # Game Loop - draw
@@ -346,7 +346,7 @@ class Game:
         #self.all_sprites.draw(self.screen)
         # *after* drawing everything, flip the display
         screen.blit(pygame.transform.scale(self.display, (Settings.WIDTH, Settings.HEIGHT)), (0, 0))
-        pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(Settings.WIDTH, Settings.HEIGHT, Settings.WIDTH, Settings.HEIGHT))
+        '''pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(Settings.WIDTH, Settings.HEIGHT, Settings.WIDTH, Settings.HEIGHT))
         pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, Settings.WIDTH, Settings.HEIGHT))
         for background_object in background_objects:
             obj_rect = pygame.Rect(background_object[1][0] - self.player.rect.x * background_object[0],
@@ -355,15 +355,15 @@ class Game:
             if background_object[0] == 0.5:
                 pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
             else:
-                pygame.draw.rect(self.display, (9, 91, 85), obj_rect)
+                pygame.draw.rect(self.display, (9, 91, 85), obj_rect)'''
         #image = pygame.transform.scale(pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), (300, 200))
         #pygame.draw.rect(self.display, pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), pg.Rect(self.player.rect.x *0.5, self.player.rect.y * 0.5, 276, 159))
         image = pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png')
         image = pg.image.load(path + r'\images\maps\background1.png')
-        pillar = pg.image.load(path + r'\images\maps\pillars.png')
+        #pillar = pg.image.load(path + r'\images\maps\pillars.png')
 
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
-        self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
+        #self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
 
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":

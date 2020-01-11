@@ -1,14 +1,9 @@
-# Sprite classes for platform game
-import glob, os
-import random
+import glob, os, random, pygame, Settings
 
 import pygame as pg
-import pygame, Settings
 from Settings import *
-import Settings
 vec = pg.math.Vector2
 
-#TODO QUE EL PASILLO DEL FONDO TENGA DOBLE FONOD CON MOVIMIENTO
 #TODO SI MUERES ANTES QUE EL BOSS, CANCELAR BULLETS / ENEMY INVENCIBILITY
 
 def load_images(folder_path):
@@ -18,33 +13,21 @@ def load_images(folder_path):
         images.append(folder_path + '/' + files)
     return images
 
-class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
+class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
         self.life = Life_Bar("Boss", 6, 42, GREEN)
         self.game = game
-        #self.image = pg.Surface((30, 40))
         self.img = pg.image.load(path+'\images\MM_WS.png')
-        #self.image = pg.Surface((15, 34)) #14, 34 informarme sobre el pg.surface
-        #self.image = pg.image.load(os.getcwd()+'\images\MM_WS.png') #images/MM_WS.png
-        #self.image.fill(YELLOW)
         self.rect = pygame.Rect(100,100,15,34)
         self.rect.x = 50
         self.rect.y = 50
-        #self.rect = self.image.get_rect()
-        #self.rect.center = (WIDTH / 2, HEIGHT / 2)
-        #self.pos = vec(WIDTH / 2, HEIGHT / 2)
-        self.pos = pygame.Rect(100,100,15,34)
-        self.pos.x = 50
-        self.pos.y = 50
-        #self.pos = vec(50,50)
         self.vel = vec(0, 0)
-        self.acc = vec(0, 0)
+        #self.acc = vec(0, 0)
         self.right = True
         self.moving = False
         self.dashing = False
         self.timer = 0
-        #self.last = pygame.time.get_ticks()
         self.clock = self.game.clock
         self.cooldown = 100
         self.animation_cooldown = 15
@@ -75,17 +58,6 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
                 self.image = pg.image.load(self.spawn_sprites[self.count])
                 self.count += 1
 
-    def jump(self):
-        # jump only if standing on a platform
-        self.rect.x += 1
-        hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-        self.rect.x -= 1
-        self.rect.y -= 5
-        if hits:
-            self.vel.y = -15
-        else:
-            self.rect.y += 2
-
     def set_clock(self):
         self.time = self.clock.tick()
         self.counter += self.time
@@ -93,7 +65,7 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
         #print(self.counter)
 
     def update(self):
-        self.life.set_clock_player(self.clock)
+        self.life.set_clock_player(self.time)
         if self.charging:
             self.charge.set_clock()
         self.charge.update()
@@ -104,7 +76,6 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
         if self.life.h <= 0:
             self.death()
         else:
-            #self.image.blit(pg.image.load(self.path+'\images\MM_WS.png'),(200, 300))
             self.acc = vec(0, PLAYER_GRAV)
             keys = pg.key.get_pressed()
             if self.vel.x >= 0 and self.vel.x < 1 or self.vel.x > -1 and self.vel.x <= 0:
@@ -141,10 +112,8 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
                     self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
                     #print(self.rect.x)
                     if not self.shoot:
-                        #self.image = pg.image.load(path+r"\images"+name+"\MM_WS.png")
                         self.img = pg.image.load(path + r"\images"+name+"\MM_WS.png")
                     elif not self.shoot:
-                        #self.image = pg.image.load(path + r"\images"+name+"\MM_WS_l.png")
                         self.img = pg.image.load(path + r"\images"+name+"\MM_WS_l.png")
                     elif self.shoot_sprite:
                         self.img = pg.image.load(self.shoot_sprite[self.count])
@@ -167,54 +136,31 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
             if keys[pg.K_a] and keys[pg.K_LEFT]:
                 self.img = pg.image.load(path + r"\images"+name+"\MM_WS_dash_1.png")
                 self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
-                #self.rect = pygame.Rect(self.img.get_rect())
                 self.right = False
                 if self.counter > self.cooldown:
                     self.moving = True
                     for i in range(1,5):
                         self.rect.x -= 1
-                        #self.vel.x -= 0.75
-                        #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-                        #if hits:
-                            #self.vel.x -= 0.75
-                        #self.acc.x = -PLAYER_ACC
-                        #self.pos.x -= 1
                     self.counter = 0
-                    #self.vel.x = 0
 
             if keys[pg.K_a] and keys[pg.K_RIGHT]:
                 #self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
                 self.img = pg.image.load(path + r"\images"+name+"\MM_WS_dash_1.png")
                 self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
-                #self.rect = pygame.Rect(self.img.get_rect())
                 self.moving = True
                 if self.counter > self.cooldown:
                     for i in range(1, 5):
-                        #self.vel.x += 1.5
                         self.pos.x += 1
-                        #hits = pg.sprite.spritecollide(self, self.game.platforms, False)
-                        #if hits:
-                            #self.vel.x += 0.75
                     self.counter = 0
 
             if not self.collide:
-                # apply friction
                 self.acc.x += self.vel.x * PLAYER_FRICTION
                 # equations of motion
                 self.vel += self.acc
-                #self.pos += self.vel + 0.5 * self.acc
-                # wrap around the sides of the screen
             if self.rect.x > WIDTH:
                 self.rect.x = WIDTH
             if self.rect.x < 0:
                 self.rect.x = 0
-
-            if self.pos.x > WIDTH:
-                self.pos.x = WIDTH
-            if self.pos.x < 0:
-                self.pos.x = 0
-
-            #self.rect.midbottom = self.pos
 
     def dmg(self):
         if self.animation_dmg_counter < len(self.dmg_sprites):
@@ -226,7 +172,6 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
             self.able_to_move = False
             if self.animation_death_counter == 0:
                 self.img = pg.image.load(self.shoot_sprite[self.animation_death_counter])
-                print(self.counter)
             if self.counter > 100 and self.animation_death_counter < len(self.death_sprites): #TODO ESCOGER OTRO COUNTER
                 self.img = pg.image.load(self.death_sprites[self.animation_death_counter])
                 self.animation_death_counter+=1
@@ -238,8 +183,6 @@ class Player(pg.sprite.Sprite): #TODO IF DAMAGE, EMPUJAR UN POCO ATRAS
 class Bullet(pg.sprite.Sprite):
     def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
-        # self.image = pg.Surface((30, 40))
-        #self.img = pg.image.load(self.path + '\images\MM_WS.png')
         self.rect = pygame.Rect(0, 0, 8, 8)
         self.right = player.right
         if self.right:
@@ -247,7 +190,6 @@ class Bullet(pg.sprite.Sprite):
         else:
             self.rect.x = player.rect.x-24
         self.init_rect = self.rect.x
-        #self.img = pg.image.load(r'Megaman\images\blocks\grass.png')
         self.right = player.right
         self.special = False
         self.active = True
@@ -259,8 +201,6 @@ class Bullet(pg.sprite.Sprite):
             self.rect.y = player.rect.y + 4
         self.shoot_sprites = load_images(path + r"\images"+name+"\MM_shoot_1")
 
-        #self.spawn_sprites = load_images(self.path + '\images\shoot')
-
     def set_clock(self):
         self.time = self.clock.tick()
         self.counter += self.time
@@ -269,10 +209,6 @@ class Bullet(pg.sprite.Sprite):
     def update(self):
         if self.special:
             self.img = pg.image.load(self.shoot_sprites[self.count])
-
-        '''if self.animation_counter > self.animation_cooldown:
-            self.count += 1
-            self.animation_counter = 0'''
 
         if self.rect.x < (self.init_rect+120) and self.right:
             self.rect.x += 10
@@ -329,10 +265,7 @@ class Enemy(pg.sprite.Sprite):
     def __init__(self, life, x, y, w, h, game):
         pg.sprite.Sprite.__init__(self)
         self.game = game
-        #self.life = Life_Bar(life)
-        # self.image = pg.Surface((30, 40))
         self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
-        #self.img = pg.image.load(path + '\images\omega.png')
         #TODO SPRITE self.img = pg.image.load(path + '\images\MM_WS.png')
         self.rect = pygame.Rect(x, y, w, h)
         self.y = y
@@ -385,7 +318,7 @@ class Omega(pg.sprite.Sprite):
         self.enemy = enemy
         self.left_hand = Left_hand(self.enemy.x, self.enemy.y, player)
         self.right_hand = Right_hand(self.enemy.x, self.enemy.y, player)
-        self.ball = None
+        self.ball = None #TODO array of balls
         self.ball2 = None
         self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)
 
@@ -397,7 +330,7 @@ class Omega(pg.sprite.Sprite):
             self.ball.update(True)
         if self.ball2 != None:
             self.ball2.update(True)
-        if self.enemy.life.constant_dmg == 3:
+        if self.enemy.life.constant_dmg == 3: #self.right_hand.rings_number < 2 or self.left_hand.rings_number < 2
             self.enemy.assault = True
             self.left_hand.attack()
             if self.enemy.life.w < 60:
@@ -447,7 +380,7 @@ class Left_hand(pg.sprite.Sprite):
                 self.rect.x +=3
             else:
                 self.able_to_move = False
-                if self.rings_number != 3:
+                if self.rings_number < 3:
                     self.shoot()
                 else:
                     self.ring = None
@@ -512,7 +445,7 @@ class Right_hand(pg.sprite.Sprite):
                 self.rect.y -=3
             else:
                 self.able_to_move = False
-                if self.rings_number != 3:
+                if self.rings_number < 3:
                     self.shoot()
                 else:
                     self.ring = None
@@ -529,7 +462,8 @@ class Right_hand(pg.sprite.Sprite):
         if self.ring.rect.x > -25:
             self.ring.rect.x -= 4
         else:
-            self.rect.x -= 18
+            if self.rect.x > 75:
+                self.rect.x -= 18
             self.ring.kill()
             self.rings_number += 1
             self.counter = 0
@@ -579,14 +513,17 @@ class Ball(pygame.sprite.Sprite):
             #self.miniball2.update()
             if self.rect.x > -10 and self.rect.y < 110 and self.down:
                 self.rect.x -= self.incx
-                self.rect.y +=6
+                self.rect.y +=12
             elif self.rect.x > -10 and self.rect.y > 0 and not self.down:
                 self.rect.x -=self.incx
-                self.rect.y -=6
+                self.rect.y -=12
             elif self.rect.y >= 110:
                 self.down = False
             elif self.rect.y <= 0:
                 self.down = True
+            elif self.rect.x <= 0:
+                self.enemy.ball = None
+
         if self.rect.x < -10:
             self.enemy.ball = None
             self.enemy.ball2 = None
@@ -639,24 +576,24 @@ class Life_Bar(pg.sprite.Sprite):
         self.type = type
         self.constant_dmg = 0
         self.counter = 0
-        self.time = 0
 
-    def set_clock_player(self, clock):
+    def set_clock_player(self, time):
         if self.constant_dmg == 1:
-            self.time = clock.tick()
-            self.counter += self.time
+            self.counter += time
+            #print("P: " + str(self.counter))
 
     def set_clock(self, clock):
         if self.constant_dmg == 3:
             self.time = clock.tick()
             self.counter += self.time
+            #print("E: "+str(self.counter))
 
     def update(self):
         pass
 
     def inmunity_player(self):
         if self.constant_dmg == 1:
-            if self.counter > 0: #5
+            if self.counter > 1500:
                 self.constant_dmg = 0
                 self.counter = 0
                 return False
@@ -667,7 +604,7 @@ class Life_Bar(pg.sprite.Sprite):
 
     def inmunity(self):
         if self.constant_dmg == 3:
-            if self.counter > 100:
+            if self.counter > 50:
                 self.constant_dmg = 0
                 self.counter = 0
                 return False
