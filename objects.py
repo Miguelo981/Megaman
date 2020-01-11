@@ -150,7 +150,7 @@ class Player(pg.sprite.Sprite):
                 self.moving = True
                 if self.counter > self.cooldown:
                     for i in range(1, 5):
-                        self.pos.x += 1
+                        self.rect.x += 1
                     self.counter = 0
 
             if not self.collide:

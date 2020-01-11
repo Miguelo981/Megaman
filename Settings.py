@@ -113,15 +113,6 @@ FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
 name = "\Megaman"
 FPS = 60
 
-# Starting platforms
-PLATFORM_LIST = [(0, HEIGHT - 40, WIDTH / 1.62, 40, False),
-                 (WIDTH / 2 - 50, HEIGHT * 3 / 4, 100, 20, False),
-                 (125, HEIGHT - 350, 100, 20, False),
-                 (350, 200, 100, 20, False),
-                 (175, 100, 50, 20, False),
-                 (300, 500, 70, 50, False),
-                 (610, 300, 120, 350, False)]
-
 def load_map(path):
     f = open(path + '.txt','r')
     data = f.read()
@@ -139,7 +130,7 @@ dirt_img = pygame.image.load(path+'/images/blocks/dirt.png')
 metal1_img = pygame.image.load(path+'/images/blocks/m1.png')
 metal2_img = pygame.image.load(path+'/images/blocks/m2.png')
 metal3_img = pygame.image.load(path+'/images/blocks/m3.png')
-background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
+#background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
 true_scroll = [0,0]
 
 # define colors
