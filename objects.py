@@ -1,4 +1,4 @@
-import glob, os, random, pygame, Settings
+import glob, os, random, pygame, Settings, Game
 
 import pygame as pg
 from Settings import *
@@ -157,8 +157,8 @@ class Player(pg.sprite.Sprite):
                 self.acc.x += self.vel.x * PLAYER_FRICTION
                 # equations of motion
                 self.vel += self.acc
-            if self.rect.x > WIDTH:
-                self.rect.x = WIDTH
+            #if self.rect.x > WIDTH:
+             #   self.rect.x = WIDTH
             if self.rect.x < 0:
                 self.rect.x = 0
 
@@ -186,9 +186,9 @@ class Bullet(pg.sprite.Sprite):
         self.rect = pygame.Rect(0, 0, 8, 8)
         self.right = player.right
         if self.right:
-            self.rect.x = player.rect.x+24
+            self.rect.x = player.rect.x+24-Game.scroll[0]
         else:
-            self.rect.x = player.rect.x-24
+            self.rect.x = player.rect.x-24+Game.scroll[0]
         self.init_rect = self.rect.x
         self.right = player.right
         self.special = False
@@ -261,15 +261,89 @@ class Charge(pg.sprite.Sprite):
             self.counter += 1
             self.animation_counter = 0
 
+class Minion(pg.sprite.Sprite):
+    def __init__(self, x, y, w, h, game):
+        pg.sprite.Sprite.__init__(self)
+        self.game = game
+        self.img = pg.image.load(path + r'\images\Enemies\minion\0.png')
+        self.rect = pygame.Rect(x, y, w, h)
+        self.rect.x = x
+        self.rect.y = y
+        self.life = Life_Bar("Boss", 32, 6, RED)
+        self.right = True
+        self.moving = False
+        self.timer = 0
+        self.cooldown = 100
+        self.animation_cooldown = 15
+        self.animation_counter = 0
+        self.counter = 0
+        self.count = 0
+        self.time = clock.tick()
+        self.shoot = False
+        self.shoots = []
+        self.down = False
+        self.clock = self.game.clock
+        self.dmg_coldown = 100
+        self.assault = False
+
+    def update(self):
+        self.life.set_clock(self.clock)
+        if self.life.w <= 0:
+            self.img = pg.image.load(path + r'\images\Enemies\minion\death\0.png')
+
+    def behavior(self):
+        if self.rect.x < self.game.player.rect.x-8:
+            self.right = False
+            self.shoot()
+        elif self.rect.x > self.game.player.rect.x+8:
+            self.right = True
+            self.shoot()
+
+    def shoot(self):
+        self.shoots.append(Bullet(self))
+
+class Bullet2(pg.sprite.Sprite):
+    def __init__(self, minion):
+        pg.sprite.Sprite.__init__(self)
+        self.rect = pygame.Rect(0, 0, 8, 8)
+        self.right = minion.right
+        if self.right:
+            self.rect.x = minion.rect.x+24
+        else:
+            self.rect.x = minion.rect.x-24
+        self.init_rect = self.rect.x
+        self.right = minion.right
+        self.active = True
+        self.count = 0
+        self.rect.y = minion.rect.y + 4
+        self.img = pg.image.load(path + r"\images\Enemies\minion\bullet\0.png")
+        self.bullet_sprites = load_images(path + r"\images\Enemies\minion\bullet")
+
+    def set_clock(self):
+        self.time = self.clock.tick()
+        self.counter += self.time
+        self.animation_counter += self.time
+
+    def update(self):
+        self.img = pg.image.load(self.bullet_sprites[self.count])
+
+        if self.rect.x < (self.init_rect+120) and self.right:
+            self.rect.x += 5
+            self.count += 1
+        elif self.rect.x > (self.init_rect-120) and not self.right:
+            self.rect.x -= 5
+            self.count += 1
+        else:
+            self.active = False
+        if self.count > 4:
+            self.count = 0
+
 class Enemy(pg.sprite.Sprite):
-    def __init__(self, life, x, y, w, h, game):
+    def __init__(self, x, y, w, h, game):
         pg.sprite.Sprite.__init__(self)
         self.game = game
         self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
-        #TODO SPRITE self.img = pg.image.load(path + '\images\MM_WS.png')
         self.rect = pygame.Rect(x, y, w, h)
-        self.y = y
-        self.x = x
         self.rect.x = x
         self.rect.y = y
         self.life = Life_Bar("Boss", 84, 6, RED)
@@ -300,11 +374,11 @@ class Enemy(pg.sprite.Sprite):
         else:
             self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
 
-        if self.rect.y < (self.y+10) and not self.down and not self.assault:
+        if self.rect.y < (self.rect.y+10) and not self.down and not self.assault:
             self.rect.y += 1
         else:
             self.down = True
-        if self.rect.y > (self.y-10) and self.down and not self.assault:
+        if self.rect.y > (self.rect.y-10) and self.down and not self.assault:
             self.rect.y -= 1
         else:
             self.down = False
@@ -316,8 +390,8 @@ class Omega(pg.sprite.Sprite):
     def __init__(self, enemy, player):
         pg.sprite.Sprite.__init__(self)
         self.enemy = enemy
-        self.left_hand = Left_hand(self.enemy.x, self.enemy.y, player)
-        self.right_hand = Right_hand(self.enemy.x, self.enemy.y, player)
+        self.left_hand = Left_hand(self.enemy.rect.x, self.enemy.rect.y, player)
+        self.right_hand = Right_hand(self.enemy.rect.x, self.enemy.rect.y, player)
         self.ball = None #TODO array of balls
         self.ball2 = None
         self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)

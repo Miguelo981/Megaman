@@ -27,23 +27,46 @@ class Game:
         self.enemies = []
         self.counter = 0
         self.time = 0
+        self.freeze_camera = False
 
     def set_enemies(self):
-        self.enemies.append(Omega(Enemy(50, 155, 10, 100, 143, self), self.player))
+        self.enemies.append(Omega(Enemy(1350, 10, 100, 143, self), self.player)) #50 155 10
+        self.enemies.append(Minion(250, 105, 26, 39, self))
+        self.enemies.append(Minion(50, 105, 26, 39, self))
+
+    def get_tile_sprite(self, tile):
+        if tile == '1':
+            return Settings.dirt_img
+        if tile == '2':
+            return Settings.grass_img
+        if tile == '3':
+            return Settings.metal1_img
+        if tile == '4':
+            return Settings.metal2_img
+        if tile == '5':
+            return Settings.metal3_img
 
     def charge_map(self):
-        '''true_scroll[0] += (self.player.rect.x - true_scroll[0] - 152) / 20
-        true_scroll[1] += (self.player.rect.y - true_scroll[1] - 106) / 20
-        scroll = true_scroll.copy()
-        scroll[0] = int(scroll[0])
-        scroll[1] = int(scroll[1])'''
+        global scroll
+        if not self.freeze_camera:
+            true_scroll[0] += (self.player.rect.x - true_scroll[0] - 100)  #152
+        #true_scroll[1] += (self.player.rect.y - true_scroll[1] - 106)  #106
+            scroll = true_scroll.copy()
+            scroll[0] = int(scroll[0])
+        #scroll[1] = int(scroll[1])
         self.tile_rects = []
         #tile_rects = []
         y = 0
         for layer in game_map:
             x = 0
             for tile in layer:
-                if tile == '1':
+                if self.player.rect.x > 100 and tile != '0':
+                    self.display.blit(self.get_tile_sprite(tile), (x*16-scroll[0],y*16))
+                elif tile != '0':
+                    self.display.blit(self.get_tile_sprite(tile), (x * 16, y * 16))
+                if tile!= '0':
+                    self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
+                '''if tile == '1':
                     self.display.blit(Settings.dirt_img, (x * 16, y * 16))
                 if tile == '2':
                     self.display.blit(Settings.grass_img, (x * 16, y * 16))
@@ -54,7 +77,7 @@ class Game:
                 if tile == '5':
                     self.display.blit(Settings.metal3_img, (x * 16, y * 16))
                 if tile != '0':
-                    self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
+                    self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))'''
                 #self.all_sprites.add(t)
                 #self.platforms.add(t)
                 x += 1
@@ -89,19 +112,22 @@ class Game:
 
         if self.collision_player_ball():
             pass
-
-        self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
+        if self.player.rect.x > 100:
+            self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x-scroll[0], self.player.rect.y))
+        else:
+            self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
         self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
         self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
         if self.player.charging:
             self.display.blit(pygame.transform.flip(self.player.charge.img, False, False), (self.player.charge.rect.x, self.player.charge.rect.y))
         for enemy in self.enemies:
-            if enemy.enemy.life.w > 0:
-                self.display.blit(enemy.enemy.life.image, (enemy.enemy.rect.x + 25, enemy.enemy.rect.y - 10))
-            else:
-                enemy.enemy.kill()
-                self.enemies.remove(enemy)
+            if enemy.__class__.__name__ == "Omega":
+                if enemy.enemy.life.w > 0:
+                    self.display.blit(enemy.enemy.life.image, (enemy.enemy.rect.x + 25, enemy.enemy.rect.y - 10))
+                else:
+                    enemy.enemy.kill()
+                    self.enemies.remove(enemy)
 
         #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
         #self.player.rect = self.move(tile_rects)
@@ -114,10 +140,6 @@ class Game:
         self.set_enemies()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.enemies)
-        '''for plat in PLATFORM_LIST:
-            p = Platform(*plat)
-            self.all_sprites.add(p)
-            self.platforms.add(p)'''
         self.run()
 
     def run(self):
@@ -141,52 +163,67 @@ class Game:
 
     def collision_enemy(self, bullet):
         for enemy in self.enemies:
-            if bullet.rect.colliderect(enemy.enemy):
-                if bullet.special:
-                    enemy.enemy.life.quit_enemy_life(9)
-                    enemy.enemy.life.constant_dmg = 3
-                else:
-                    enemy.enemy.life.quit_enemy_life(3)
-                return True
+            if enemy.__class__.__name__ == "Omega":
+                if bullet.rect.colliderect(enemy.enemy):
+                    if bullet.special:
+                        enemy.enemy.life.quit_enemy_life(9)
+                        enemy.enemy.life.constant_dmg = 3
+                    else:
+                        enemy.enemy.life.quit_enemy_life(3)
+                    return True
+            elif bullet.rect.colliderect(enemy):
+                    if bullet.special:
+                        enemy.life.quit_enemy_life(9)
+                        enemy.life.constant_dmg = 3
+                    else:
+                        enemy.life.quit_enemy_life(3)
+                    return True
         return False
 
     def collision_player_enemy(self):
         for enemy in self.enemies:
-            if self.player.rect.colliderect(enemy.enemy):
+            if enemy.__class__.__name__ == "Omega":
+                if self.player.rect.colliderect(enemy.enemy):
+                    self.player.life.quit_life(3)
+                    return True
+            elif self.player.rect.colliderect(enemy):
                 self.player.life.quit_life(3)
                 return True
         return False
 
     def collision_player_enemy_wall(self):
         for enemy in self.enemies:
-            if self.player.rect.colliderect(enemy.invisibleWall):
-                return True
+            if enemy.__class__.__name__ == "Omega":
+                if self.player.rect.colliderect(enemy.invisibleWall):
+                    return True
         return False
 
 
     def collision_player_rings(self):
         for enemy in self.enemies:
-            if enemy.left_hand.ring != None:
-                if self.player.rect.colliderect(enemy.left_hand.ring):
-                    self.player.life.quit_life(5)
-                    return True
-            if enemy.right_hand.ring != None:
-                if self.player.rect.colliderect(enemy.right_hand.ring):
-                    self.player.life.quit_life(5)
-                    return True
+            if enemy.__class__.__name__ == "Omega":
+                if enemy.left_hand.ring != None:
+                    if self.player.rect.colliderect(enemy.left_hand.ring):
+                        self.player.life.quit_life(5)
+                        return True
+                if enemy.right_hand.ring != None:
+                    if self.player.rect.colliderect(enemy.right_hand.ring):
+                        self.player.life.quit_life(5)
+                        return True
         return False
 
     def collision_player_ball(self):
         for enemy in self.enemies:
-            if enemy.ball != None:
-                if self.player.rect.colliderect(enemy.ball):
-                    self.player.life.quit_life(5)
-                    return True
-            if enemy.ball2 != None:
-                if self.player.rect.colliderect(enemy.ball2):
-                    print("AAAAAAAAAAAAAAH")
-                    self.player.life.quit_life(5)
-                    return True
+            if enemy.__class__.__name__ == "Omega":
+                if enemy.ball != None:
+                    if self.player.rect.colliderect(enemy.ball):
+                        self.player.life.quit_life(5)
+                        return True
+                if enemy.ball2 != None:
+                    if self.player.rect.colliderect(enemy.ball2):
+                        print("AAAAAAAAAAAAAAH")
+                        self.player.life.quit_life(5)
+                        return True
         return False
 
     def update(self):
@@ -194,11 +231,15 @@ class Game:
         #self.player.spawn()
         # Game Loop - Update
         self.all_sprites.update()
+        print(self.player.rect)
+        if self.player.rect.x > 1200:
+            self.freeze_camera = True
+        else:
+            self.freeze_camera = False
 
         for bullet in self.player.shoots:
             bullet.update()
             if bullet.active:
-                #self.display.blit(bullet.img, (bullet.rect.x, bullet.rect.y))
                 self.display.blit(pygame.transform.flip(bullet.img, not bullet.right, False), (bullet.rect.x, bullet.rect.y))
                 if self.collision_bullet(bullet):
                     bullet.active = False
@@ -206,65 +247,7 @@ class Game:
                     bullet.active = False
             else:
                 self.player.shoots.remove(bullet)
-                #self.player.life.quit_life(5)
 
-        #TODO ACTUALIZAR AQUI LA IMAGEN DEL JUGADOR
-        #self.display.blit(pygame.transform.flip(self.player.img, False, False), (self.player.rect.x, self.player.rect.y))
-        ###self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
-        '''if self.player.moving:
-            if self.player.right:
-                self.image = pg.image.load(self.move_right_sprites[self.count])
-            else:
-                self.image = pg.image.load(self.move_left_sprites[self.count])
-            if self.player.animation_counter > self.player.animation_cooldown:
-                self.count += 1
-                self.animation_counter = 0
-        else:
-            if self.player.right:
-                self.image = pg.image.load(self.path+'\images\MM_WS.png')
-            else:
-                self.image = pg.image.load(self.path + '\images\MM_WS_l.png')'''
-
-        # check if player hits a platform - only if falling
-        if self.player.vel.y > 0 and False:
-            hits = pg.sprite.spritecollide(self.player, self.platforms, False)
-            #hits = pg.sprite.collide_rect(self.player, self.platforms)
-            if hits:
-                if hits[0].main:
-                    self.player.pos.y = hits[0].rect.top
-                    self.player.vel.y = 0
-                elif self.player.rect.y <= hits[0].rect.y and not hits[0].main:
-                    self.player.pos.y = hits[0].rect.top
-                    self.player.vel.y = 0
-                    #print("choquearri")
-                if (self.player.rect.top < hits[0].rect.y) and not hits[0].main: #or self.player.rect.top <= hits[0].rect.bottom
-                    #self.player.rect.top = hits[0].rect.y + self.player.rect.y
-                    #self.player.rect.top = hits[0].rect.bottom
-                    #self.player.rect.top = hits[0].rect.y + 5
-                    #self.player.rect.y = hits[0].rect.bottom + 5
-                    self.player.collide = True
-                    print("coqueba")
-                print(self.player.collide)
-                '''if self.player.rect.y >= hits[0].rect.y and not hits[0].main:
-                        self.player.pos.y = hits[0].rect.bottom #TODO CALCULAR DIFERENCIA
-                        print("coqueba")'''
-                if self.player.rect.x <= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
-                    #self.player.pos.x = hits[0].rect.x
-                    self.player.pos.x = hits[0].rect.left
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                    print("choqueiz")
-                if self.player.rect.x >= hits[0].rect.x and self.player.pos.y != hits[0].rect.top and not hits[0].main:
-                    #self.player.pos.x = hits[0].rect.x + hits[0].w
-                    self.player.pos.x = hits[0].rect.right
-                    self.player.vel.x = 0
-                    self.player.vel.y = 0
-                    print("choquede")
-                    #self.player.pos.y = hits[0].rect.top - hits[0].h
-                    #self.player.vel.y = 0
-                #self.player.pos.y = hits[0].rect.top
-                #self.player.vel.y = 0
-                #print(self.player.pos.y)
         self.player.collide = False
         if self.player.rect.y > Settings.HEIGHT:
             self.player.rect = pg.Rect(100,100, Settings.WIDTH / 2, Settings.HEIGHT / 2)
@@ -380,6 +363,8 @@ class Game:
                     self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x, enemy.ball2.rect.y))
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball1.image, False, False), (enemy.ball.miniball1.rect.x, enemy.ball.miniball1.rect.y))
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball2.image, False, False), (enemy.ball.miniball2.rect.x, enemy.ball.miniball2.rect.y))
+            else:
+                self.display.blit(pygame.transform.flip(enemy.img, not enemy.right, False),(enemy.rect.x-scroll[0], enemy.rect.y))
 
 
         #pg.image.load('images/bg.jpg')
