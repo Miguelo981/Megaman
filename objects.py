@@ -188,7 +188,7 @@ class Bullet(pg.sprite.Sprite):
         if self.right:
             self.rect.x = player.rect.x+24#-Game.scroll[0]
         else:
-            self.rect.x = player.rect.x-24#+Game.scroll[0]
+            self.rect.x = player.rect.x#+Game.scroll[0]
         self.init_rect = self.rect.x
         self.right = player.right
         self.special = False
