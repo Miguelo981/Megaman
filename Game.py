@@ -30,7 +30,7 @@ class Game:
         self.freeze_camera = False
 
     def set_enemies(self):
-        self.enemies.append(Omega(Enemy(1350, 10, 100, 143, self), self.player)) #50 155 10
+        #self.enemies.append(Omega(Enemy(1350, 10, 100, 143, self), self.player)) #50 155 10 1350
         self.enemies.append(Minion(250, 105, 26, 39, self))
         self.enemies.append(Minion(50, 105, 26, 39, self))
 
@@ -64,6 +64,7 @@ class Game:
                     self.display.blit(self.get_tile_sprite(tile), (x*16-scroll[0],y*16))
                 elif tile != '0':
                     self.display.blit(self.get_tile_sprite(tile), (x * 16, y * 16))
+                    scroll[0] = 0
                 if tile!= '0':
                     self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
                 '''if tile == '1':
@@ -120,7 +121,7 @@ class Game:
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
         self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
         if self.player.charging:
-            self.display.blit(pygame.transform.flip(self.player.charge.img, False, False), (self.player.charge.rect.x, self.player.charge.rect.y))
+            self.display.blit(pygame.transform.flip(self.player.charge.img, False, False), (self.player.charge.rect.x-scroll[0], self.player.charge.rect.y))
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":
                 if enemy.enemy.life.w > 0:
@@ -240,7 +241,7 @@ class Game:
         for bullet in self.player.shoots:
             bullet.update()
             if bullet.active:
-                self.display.blit(pygame.transform.flip(bullet.img, not bullet.right, False), (bullet.rect.x, bullet.rect.y))
+                self.display.blit(pygame.transform.flip(bullet.img, not bullet.right, False), (bullet.rect.x-scroll[0], bullet.rect.y))
                 if self.collision_bullet(bullet):
                     bullet.active = False
                 if self.collision_enemy(bullet):
