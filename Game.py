@@ -32,7 +32,11 @@ class Game:
     def set_enemies(self):
         #self.enemies.append(Omega(Enemy(1350, 10, 100, 143, self), self.player)) #50 155 10 1350
         self.enemies.append(Minion(250, 105, 26, 39, self))
-        self.enemies.append(Minion(50, 105, 26, 39, self))
+        self.enemies.append(Minion(350, 105, 26, 39, self))
+        self.enemies.append(Minion(550, 105, 26, 39, self))
+        self.enemies.append(Minion(650, 105, 26, 39, self))
+        self.enemies.append(Minion(850, 105, 26, 39, self))
+        self.enemies.append(Minion(950, 105, 26, 39, self))
 
     def get_tile_sprite(self, tile):
         if tile == '1':
@@ -129,6 +133,13 @@ class Game:
                 else:
                     enemy.enemy.kill()
                     self.enemies.remove(enemy)
+            else:
+                if enemy.life.w > 0:
+                    self.display.blit(enemy.life.image, (enemy.rect.x-scroll[0], enemy.rect.y - 10))
+                elif enemy.rect.y > 121:
+                    enemy.kill()
+                    self.enemies.remove(enemy)
+
 
         #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
         #self.player.rect = self.move(tile_rects)
@@ -174,11 +185,17 @@ class Game:
                     return True
             elif bullet.rect.colliderect(enemy):
                     if bullet.special:
-                        enemy.life.quit_enemy_life(9)
+                        enemy.life.quit_minion_life(9)
                         enemy.life.constant_dmg = 3
                     else:
-                        enemy.life.quit_enemy_life(3)
+                        enemy.life.quit_minion_life(3)
                     return True
+        return False
+
+    def collision_bullet_player(self, bullet):
+        if bullet.rect.colliderect(self.player):
+            self.player.life.quit_life(3)
+            return True
         return False
 
     def collision_player_enemy(self):
@@ -198,7 +215,6 @@ class Game:
                 if self.player.rect.colliderect(enemy.invisibleWall):
                     return True
         return False
-
 
     def collision_player_rings(self):
         for enemy in self.enemies:
@@ -232,11 +248,22 @@ class Game:
         #self.player.spawn()
         # Game Loop - Update
         self.all_sprites.update()
-        print(self.player.rect)
+        #print(self.player.rect)
         if self.player.rect.x > 1200:
             self.freeze_camera = True
         else:
             self.freeze_camera = False
+
+        for enemy in self.enemies:
+            if not enemy.__class__.__name__ == "Omega":
+                for bullet in enemy.shoots:
+                    bullet.update()
+                    if bullet.active:
+                        self.display.blit(pygame.transform.flip(bullet.img, not bullet.right, False), (bullet.rect.x - scroll[0], bullet.rect.y))
+                        if self.collision_bullet(bullet) or self.collision_bullet_player(bullet):
+                            bullet.active = False
+                    else:
+                        enemy.shoots.remove(bullet)
 
         for bullet in self.player.shoots:
             bullet.update()

@@ -242,7 +242,6 @@ class Charge(pg.sprite.Sprite):
             self.animation_counter += self.player.time
 
     def update(self, *args):
-
         if self.player.right:
             self.rect.x = self.player.rect.x+26
             self.rect.y = self.player.rect.y +4
@@ -269,7 +268,7 @@ class Minion(pg.sprite.Sprite):
         self.rect = pygame.Rect(x, y, w, h)
         self.rect.x = x
         self.rect.y = y
-        self.life = Life_Bar("Boss", 32, 6, RED)
+        self.life = Life_Bar("Boss", 32, 4, RED)
         self.right = True
         self.moving = False
         self.timer = 0
@@ -285,22 +284,40 @@ class Minion(pg.sprite.Sprite):
         self.clock = self.game.clock
         self.dmg_coldown = 100
         self.assault = False
+        self.alive = True
 
     def update(self):
+        self.rect = pygame.Rect(self.rect.x, self.rect.y, self.img.get_rect()[2], self.img.get_rect()[3])
         self.life.set_clock(self.clock)
         if self.life.w <= 0:
+            self.alive = False
             self.img = pg.image.load(path + r'\images\Enemies\minion\death\0.png')
+            if self.rect.y < 135:
+                self.rect.y +=random.randint(2,4);
+        else:
+            self.alive = True
+        if self.alive:
+            self.behavior()
 
     def behavior(self):
-        if self.rect.x < self.game.player.rect.x-8:
-            self.right = False
-            self.shoot()
-        elif self.rect.x > self.game.player.rect.x+8:
+        if self.rect.x < self.game.player.rect.x-8 and self.game.player.rect.x+8 <= self.rect.x:
             self.right = True
-            self.shoot()
+            self.shoot_()
+        elif self.rect.x > self.game.player.rect.x+8 and self.game.player.rect.x-8 <= self.rect.x:
+            self.right = False
+            self.shoot_()
+        else:
+            if self.rect.y >= 110:
+                self.rect.y -= 5
+            self.img = pg.image.load(path + r'\images\Enemies\minion\0.png')
 
-    def shoot(self):
-        self.shoots.append(Bullet(self))
+    def shoot_(self):
+        if not self.shoot:
+            self.shoots.append(Bullet(self))
+            self.shoot = True
+        self.img = pg.image.load(path + r'\images\Enemies\minion\shoot\0.png')
+        if self.rect.y <= 110:
+            self.rect.y += 5
 
 class Bullet2(pg.sprite.Sprite):
     def __init__(self, minion):
@@ -704,6 +721,13 @@ class Life_Bar(pg.sprite.Sprite):
                 self.w = 0
             self.image = pg.Surface((self.w, self.h))
             self.image.fill(self.color)
+
+    def quit_minion_life(self, life):
+        self.w -= life
+        if self.w < 0:
+            self.w = 0
+        self.image = pg.Surface((self.w, self.h))
+        self.image.fill(self.color)
 
     def add_life(self, life):
         self.h += life
