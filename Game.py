@@ -3,9 +3,10 @@ from encodings.punycode import selective_find
 import pygame as pg
 import pygame
 import random
-from Settings import *
 from objects import *
 import Settings
+
+#TODO SONIDOS
 
 class Game:
     def __init__(self):
@@ -30,7 +31,7 @@ class Game:
         self.freeze_camera = False
 
     def set_enemies(self):
-        #self.enemies.append(Omega(Enemy(1350, 10, 100, 143, self), self.player)) #50 155 10 1350
+        self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
         self.enemies.append(Minion(250, 105, 26, 39, self))
         self.enemies.append(Minion(350, 105, 26, 39, self))
         self.enemies.append(Minion(550, 105, 26, 39, self))

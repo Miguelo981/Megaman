@@ -266,10 +266,12 @@ class Minion(pg.sprite.Sprite):
         self.game = game
         self.img = pg.image.load(path + r'\images\Enemies\minion\0.png')
         self.rect = pygame.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
         self.rect.x = x
         self.rect.y = y
         self.life = Life_Bar("Boss", 32, 4, RED)
-        self.right = True
+        self.right = False
         self.moving = False
         self.timer = 0
         self.cooldown = 100
@@ -300,16 +302,25 @@ class Minion(pg.sprite.Sprite):
             self.behavior()
 
     def behavior(self):
-        if self.rect.x < self.game.player.rect.x-8 and self.game.player.rect.x+8 <= self.rect.x:
-            self.right = True
-            self.shoot_()
-        elif self.rect.x > self.game.player.rect.x+8 and self.game.player.rect.x-8 <= self.rect.x:
+        if self.rect.x-125 <= self.game.player.rect.x <= self.rect.x:
             self.right = False
             self.shoot_()
+        elif self.rect.x+125 >= self.game.player.rect.x >= self.rect.x:
+            self.right = True
+            self.shoot_()
         else:
-            if self.rect.y >= 110:
-                self.rect.y -= 5
-            self.img = pg.image.load(path + r'\images\Enemies\minion\0.png')
+            if random.randint(1,5) == 1 or self.moving:
+                self.moving = True
+                if self.right and self.rect.x <= (self.x+50):
+                    self.rect.x += 2
+                elif not self.right and self.rect.x >= (self.x-50):
+                    self.rect.x -= 2
+                else:
+                    self.moving = False
+                    self.right = not self.right
+                    if self.rect.y >= 110:
+                        self.rect.y -= 5
+                    self.img = pg.image.load(path + r'\images\Enemies\minion\0.png')
 
     def shoot_(self):
         if not self.shoot:
@@ -361,6 +372,8 @@ class Enemy(pg.sprite.Sprite):
         self.game = game
         self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
         self.rect = pygame.Rect(x, y, w, h)
+        self.x = x
+        self.y = y
         self.rect.x = x
         self.rect.y = y
         self.life = Life_Bar("Boss", 84, 6, RED)
@@ -391,11 +404,11 @@ class Enemy(pg.sprite.Sprite):
         else:
             self.img = pg.image.load(path + '\images\Bosses\Omega\main.png')
 
-        if self.rect.y < (self.rect.y+10) and not self.down and not self.assault:
+        if self.rect.y < (self.y+10) and not self.down and not self.assault:
             self.rect.y += 1
         else:
             self.down = True
-        if self.rect.y > (self.rect.y-10) and self.down and not self.assault:
+        if self.rect.y > (self.y-10) and self.down and not self.assault:
             self.rect.y -= 1
         else:
             self.down = False
