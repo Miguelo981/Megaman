@@ -265,6 +265,7 @@ class Game:
                             bullet.active = False
                     else:
                         enemy.shoots.remove(bullet)
+                enemy.set_clock()
 
         for bullet in self.player.shoots:
             bullet.update()

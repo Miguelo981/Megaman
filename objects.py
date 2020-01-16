@@ -5,6 +5,7 @@ from Settings import *
 vec = pg.math.Vector2
 
 #TODO SI MUERES ANTES QUE EL BOSS, CANCELAR BULLETS / ENEMY INVENCIBILITY
+#TODO PARA AHORRAR MEMORIA, SOLO MOVER ENEMIGOS QUE ESTEN 300 RECTS AL REDEDOR
 
 def load_images(folder_path):
     images = []
@@ -278,8 +279,7 @@ class Minion(pg.sprite.Sprite):
         self.animation_cooldown = 15
         self.animation_counter = 0
         self.counter = 0
-        self.count = 0
-        self.time = clock.tick()
+        self.time = 0
         self.shoot = False
         self.shoots = []
         self.down = False
@@ -287,6 +287,14 @@ class Minion(pg.sprite.Sprite):
         self.dmg_coldown = 100
         self.assault = False
         self.alive = True
+        self.move_sprites = load_images(path + r"\images\Enemies\minion\movement")
+
+    def set_clock(self):
+        self.time = self.clock.tick()
+        self.counter += self.time
+        if self.shoot and self.counter > 125:
+            self.shoot = False
+            self.counter = 0
 
     def update(self):
         self.rect = pygame.Rect(self.rect.x, self.rect.y, self.img.get_rect()[2], self.img.get_rect()[3])
@@ -309,8 +317,15 @@ class Minion(pg.sprite.Sprite):
             self.right = True
             self.shoot_()
         else:
-            if random.randint(1,5) == 1 or self.moving:
+            if random.randint(1,25) == 1 or self.moving:
                 self.moving = True
+                if self.counter > 0:
+                    if self.animation_counter < len(self.move_sprites):
+                        self.img = pg.image.load(self.move_sprites[self.animation_counter])
+                        self.animation_counter += 1
+                    else:
+                        self.animation_counter = 0
+                    self.counter = 0
                 if self.right and self.rect.x <= (self.x+50):
                     self.rect.x += 2
                 elif not self.right and self.rect.x >= (self.x-50):
@@ -318,17 +333,17 @@ class Minion(pg.sprite.Sprite):
                 else:
                     self.moving = False
                     self.right = not self.right
-                    if self.rect.y >= 110:
-                        self.rect.y -= 5
                     self.img = pg.image.load(path + r'\images\Enemies\minion\0.png')
+            if self.rect.y >= 110 and not self.shoot_():
+                self.rect.y -= 4
 
     def shoot_(self):
         if not self.shoot:
             self.shoots.append(Bullet(self))
             self.shoot = True
-        self.img = pg.image.load(path + r'\images\Enemies\minion\shoot\0.png')
         if self.rect.y <= 110:
-            self.rect.y += 5
+            self.rect.y += 4
+        self.img = pg.image.load(path + r'\images\Enemies\minion\shoot\0.png')
 
 class Bullet2(pg.sprite.Sprite):
     def __init__(self, minion):
@@ -365,6 +380,10 @@ class Bullet2(pg.sprite.Sprite):
             self.active = False
         if self.count > 4:
             self.count = 0
+
+class Drop(pg.sprite.Sprite):
+    def __init__(self):
+        pg.sprite.Sprite.__init__(self)
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, game):
