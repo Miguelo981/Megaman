@@ -26,12 +26,19 @@ class Game:
         self.vertical_momentum = 0
         self.air_timer = 0
         self.enemies = []
+        self.objects = []
         self.counter = 0
         self.time = 0
         self.freeze_camera = False
 
     def set_enemies(self):
         self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
+        self.enemies.append(Minion(250, 105, 26, 39, self))
+        self.enemies.append(Minion(350, 105, 26, 39, self))
+        self.enemies.append(Minion(550, 105, 26, 39, self))
+        self.enemies.append(Minion(650, 105, 26, 39, self))
+        self.enemies.append(Minion(850, 105, 26, 39, self))
+        self.enemies.append(Minion(950, 105, 26, 39, self))
         self.enemies.append(Minion(250, 105, 26, 39, self))
         self.enemies.append(Minion(350, 105, 26, 39, self))
         self.enemies.append(Minion(550, 105, 26, 39, self))
@@ -118,6 +125,9 @@ class Game:
 
         if self.collision_player_ball():
             pass
+        if self.collision_player_object():
+            pass
+
         if self.player.rect.x > 100:
             self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x-scroll[0], self.player.rect.y))
         else:
@@ -153,6 +163,7 @@ class Game:
         self.set_enemies()
         self.all_sprites.add(self.player)
         self.all_sprites.add(self.enemies)
+        self.all_sprites.add(self.objects)
         self.run()
 
     def run(self):
@@ -242,6 +253,14 @@ class Game:
                         print("AAAAAAAAAAAAAAH")
                         self.player.life.quit_life(5)
                         return True
+        return False
+
+    def collision_player_object(self):
+        for object in self.objects:
+            if object.type != "None":
+                if self.player.rect.colliderect(object):
+                    object.effect()
+                    return True
         return False
 
     def update(self):
@@ -377,6 +396,10 @@ class Game:
 
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
         #self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
+
+        for object in self.objects:
+            if object.type != "None":
+                self.display.blit(pygame.transform.flip(object.img, False, False),(object.rect.x-scroll[0], object.rect.y))
 
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":

@@ -300,10 +300,14 @@ class Minion(pg.sprite.Sprite):
         self.rect = pygame.Rect(self.rect.x, self.rect.y, self.img.get_rect()[2], self.img.get_rect()[3])
         self.life.set_clock(self.clock)
         if self.life.w <= 0:
-            self.alive = False
             self.img = pg.image.load(path + r'\images\Enemies\minion\death\0.png')
             if self.rect.y < 135:
                 self.rect.y +=random.randint(2,4);
+            if self.alive:
+                self.alive = False
+                if random.randint(1,2) == 1:
+                    print("item created")
+                    self.game.objects.append(Drop(self))
         else:
             self.alive = True
         if self.alive:
@@ -382,8 +386,42 @@ class Bullet2(pg.sprite.Sprite):
             self.count = 0
 
 class Drop(pg.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, enemy):
         pg.sprite.Sprite.__init__(self)
+        self.enemy = enemy
+        self.rect = pygame.Rect(0, 0, 16, 8)
+        self.rect.x = self.enemy.rect.x
+        self.rect.y = 137
+        self.type = ""
+        self.createType()
+
+    def createType(self):
+        num = random.randint(1, 10)
+        if num > 9:
+            self.type = "life"
+            self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+        elif num > 7:
+            self.type = "heal"
+            self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+        elif num > 4:
+            self.type = "points"
+            self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+        else:
+            self.type = "None"
+            self.kill()
+
+    def effect(self):
+        if self.type == "life":
+            pass
+        if self.type == "heal":
+            self.enemy.game.player.life.add_life(5)
+            self.type = "None"
+            self.kill()
+        if self.type == "points":
+            pass
+
+    def update(self):
+        pass
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, game):
