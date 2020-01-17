@@ -177,6 +177,10 @@ class Player(pg.sprite.Sprite):
                 self.img = pg.image.load(self.death_sprites[self.animation_death_counter])
                 self.animation_death_counter+=1
             else:
+                if Settings.lifes > 1:
+                    Settings.lifes -= 1
+                else:
+                    self.game.playing = False
                 self.alive = False
 
 
@@ -305,8 +309,7 @@ class Minion(pg.sprite.Sprite):
                 self.rect.y +=random.randint(2,4);
             if self.alive:
                 self.alive = False
-                if random.randint(1,2) == 1:
-                    print("item created")
+                if random.randint(1,3) != 3:
                     self.game.objects.append(Drop(self))
         else:
             self.alive = True
@@ -389,36 +392,41 @@ class Drop(pg.sprite.Sprite):
     def __init__(self, enemy):
         pg.sprite.Sprite.__init__(self)
         self.enemy = enemy
-        self.rect = pygame.Rect(0, 0, 16, 8)
-        self.rect.x = self.enemy.rect.x
-        self.rect.y = 137
         self.type = ""
+        self.vel = vec(0, 0)
+        self.vertical_momentum = 0
         self.createType()
+        if self.type != "None":
+            self.rect.x = self.enemy.rect.x
+            self.rect.y = self.enemy.rect.y
 
     def createType(self):
         num = random.randint(1, 10)
         if num > 9:
             self.type = "life"
-            self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+            self.img = pg.image.load(path + r"\images\objects\life.png")
+            self.rect = pygame.Rect(0, 0, 16, 15)
         elif num > 7:
             self.type = "heal"
             self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+            self.rect = pygame.Rect(0, 0, 16, 8)
         elif num > 4:
             self.type = "points"
-            self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+            self.img = pg.image.load(path + r"\images\objects\points\1.png")
+            self.rect = pygame.Rect(0, 0, 13, 16)
         else:
             self.type = "None"
             self.kill()
 
     def effect(self):
         if self.type == "life":
-            pass
+            Settings.lifes += 1
         if self.type == "heal":
             self.enemy.game.player.life.add_life(5)
-            self.type = "None"
-            self.kill()
         if self.type == "points":
             pass
+        self.type = "None"
+        self.kill()
 
     def update(self):
         pass

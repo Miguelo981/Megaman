@@ -112,6 +112,7 @@ ICON = path+"/images/megaman_exe_navi.png"
 FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
 name = "\Megaman"
 FPS = 60
+lifes = 3
 
 def load_map(path):
     f = open(path + '.txt','r')

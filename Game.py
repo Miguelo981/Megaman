@@ -310,6 +310,13 @@ class Game:
                 hit_list.append(tile)
         return hit_list
 
+    def collision_test_object(self, object, tiles):
+        hit_list = []
+        for tile in tiles:
+            if  object.rect.colliderect(tile):
+                hit_list.append(tile)
+        return hit_list
+
     def move(self, tiles):
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
         #self.player.rect.x += self.player.vel.x
@@ -390,15 +397,27 @@ class Game:
                 pygame.draw.rect(self.display, (9, 91, 85), obj_rect)'''
         #image = pygame.transform.scale(pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), (300, 200))
         #pygame.draw.rect(self.display, pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), pg.Rect(self.player.rect.x *0.5, self.player.rect.y * 0.5, 276, 159))
-        image = pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png')
+        #image = pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png')
         image = pg.image.load(path + r'\images\maps\background1.png')
         #pillar = pg.image.load(path + r'\images\maps\pillars.png')
 
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
         #self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
 
+        self.display.blit(Settings.text_format("0"+str(Settings.lifes), FONT, 5, WHITE), (5, 25))
+
         for object in self.objects:
             if object.type != "None":
+                object.rect.y += object.vertical_momentum * 1.5
+                object.vertical_momentum += 0.2
+                if object.vertical_momentum > 3:
+                    object.vertical_momentum = 3
+
+                for tile in self.collision_test_object(object, self.tile_rects):
+                    object.rect.y += 3
+                    if self.player.vel.y > 0:
+                        object.rect.bottom = tile.top
+                        object.vertical_momentum = 0
                 self.display.blit(pygame.transform.flip(object.img, False, False),(object.rect.x-scroll[0], object.rect.y))
 
         for enemy in self.enemies:
