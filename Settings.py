@@ -86,6 +86,12 @@ def text_format(message, textFont, textSize, textColor):
 
     return newText
 
+def text_format_pygame(message, textFont, textSize, textColor):
+    newFont = pygame.font.SysFont(textFont, textSize)
+    newText = newFont.render(message, 0, textColor)
+
+    return newText
+
 def music(file, state):
     if state:
         pygame.mixer.init()
@@ -110,9 +116,21 @@ PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.8
 ICON = path+"/images/megaman_exe_navi.png"
 FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
+
 name = "\Megaman"
 FPS = 60
 lifes = 3
+points = 0
+
+def get_points_text():
+    if len(str(points)) > 3:
+        return "0" + str(points)
+    elif len(str(points)) > 2:
+        return "00"+str(points)
+    elif len(str(points)) > 1:
+        return "000"+str(points)
+    if len(str(points)) > 0:
+        return "0000"+str(points)
 
 def load_map(path):
     f = open(path + '.txt','r')
@@ -124,7 +142,8 @@ def load_map(path):
         game_map.append(list(row))
     return game_map
 
-game_map = load_map('map')
+map = 'map'
+game_map = load_map(map)
 
 grass_img = pygame.image.load(path+'/images/blocks/grass.png')
 dirt_img = pygame.image.load(path+'/images/blocks/dirt.png')

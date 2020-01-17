@@ -53,6 +53,7 @@ class Player(pg.sprite.Sprite):
         self.charging = False
         self.alive = True
         self.air = False
+        self.sound = pygame.mixer.Sound
 
     def spawn(self):
             if self.animation_counter > self.animation_cooldown and self.count <= 11:
@@ -179,6 +180,7 @@ class Player(pg.sprite.Sprite):
             else:
                 if Settings.lifes > 1:
                     Settings.lifes -= 1
+                    pygame.mixer.Sound.play(pygame.mixer.Sound(path + r'\images\MMX09.wav'))
                 else:
                     self.game.playing = False
                 self.alive = False
@@ -275,7 +277,7 @@ class Minion(pg.sprite.Sprite):
         self.y = y
         self.rect.x = x
         self.rect.y = y
-        self.life = Life_Bar("Boss", 32, 4, RED)
+        self.life = Life_Bar("Boss", 16, 4, RED)
         self.right = False
         self.moving = False
         self.timer = 0
@@ -395,7 +397,9 @@ class Drop(pg.sprite.Sprite):
         self.type = ""
         self.vel = vec(0, 0)
         self.vertical_momentum = 0
+        self.sprites = []
         self.createType()
+        self.count = 0
         if self.type != "None":
             self.rect.x = self.enemy.rect.x
             self.rect.y = self.enemy.rect.y
@@ -409,10 +413,12 @@ class Drop(pg.sprite.Sprite):
         elif num > 7:
             self.type = "heal"
             self.img = pg.image.load(path + r"\images\objects\heal\4.png")
+            self.sprites = load_images(path + r"\images\objects\heal")
             self.rect = pygame.Rect(0, 0, 16, 8)
         elif num > 4:
             self.type = "points"
             self.img = pg.image.load(path + r"\images\objects\points\1.png")
+            self.sprites = load_images(path + r"\images\objects\points")
             self.rect = pygame.Rect(0, 0, 13, 16)
         else:
             self.type = "None"
@@ -424,12 +430,16 @@ class Drop(pg.sprite.Sprite):
         if self.type == "heal":
             self.enemy.game.player.life.add_life(5)
         if self.type == "points":
-            pass
+            Settings.points += 50
         self.type = "None"
         self.kill()
 
     def update(self):
-        pass
+        if self.count < len(self.sprites) and len(self.sprites) > 0:
+            self.img = pg.image.load(self.sprites[self.count])
+            self.count += 1
+        else:
+            self.count = 0
 
 class Enemy(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, game):
@@ -813,6 +823,27 @@ class Life_Bar(pg.sprite.Sprite):
             self.h = self.max_life
         self.image = pg.Surface((self.w, self.h))
         self.image.fill(self.color)
+
+class Door(pg.sprite.Sprite):
+    def __init__(self, x, y):
+        pg.sprite.Sprite.__init__(self)
+        self.rect = pygame.Rect(x, y, 43, 88)
+        self.rect.x = x
+        self.rect.y = y
+        self.count = 0
+        self.sprites = load_images(path + r"\images\blocks\door")
+        self.img = pg.image.load(path + r"\images\blocks\door\0.png")
+
+    def open(self):
+        self.img = pg.image.load(self.sprites[self.count])
+        if self.count < len(self.sprites)-1:
+            self.count += 1
+
+    def close(self):
+        if self.count > 0:
+            self.img = pg.image.load(self.sprites[self.count])
+            self.count -= 1
+
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, main, color):

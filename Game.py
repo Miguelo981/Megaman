@@ -3,10 +3,13 @@ from encodings.punycode import selective_find
 import pygame as pg
 import pygame
 import random
+
+from pygame.tests.base_test import pygame_quit
+
 from objects import *
 import Settings
 
-#TODO SONIDOS
+#TODO SONIDOS, SONIDO CUANDO CAIGAS
 
 class Game:
     def __init__(self):
@@ -32,7 +35,7 @@ class Game:
         self.freeze_camera = False
 
     def set_enemies(self):
-        self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
+        #self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
         self.enemies.append(Minion(250, 105, 26, 39, self))
         self.enemies.append(Minion(350, 105, 26, 39, self))
         self.enemies.append(Minion(550, 105, 26, 39, self))
@@ -128,6 +131,19 @@ class Game:
         if self.collision_player_object():
             pass
 
+        if self.collision_player_door():
+            self.door.open()
+            if self.door.count < 4:
+                self.enemies.clear()
+                self.freeze_camera = True
+                scroll[0] = 0
+                self.player.rect.x = 10
+                Settings.map = 'map2'
+                self.enemies.append(Omega(Enemy(155, 10, 100, 143, self), self.player))
+
+        else:
+            self.door.close()
+
         if self.player.rect.x > 100:
             self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x-scroll[0], self.player.rect.y))
         else:
@@ -157,6 +173,7 @@ class Game:
 
     def new(self):
         # start a new game
+        self.door = Door(1350, 60)
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.player = Player(self)
@@ -263,6 +280,11 @@ class Game:
                     return True
         return False
 
+    def collision_player_door(self):
+        if self.player.rect.colliderect(self.door):
+            return True
+        return False
+
     def update(self):
         #self.display.blit(pygame.transform.flip(self.player))
         #self.player.spawn()
@@ -298,9 +320,10 @@ class Game:
                 self.player.shoots.remove(bullet)
 
         self.player.collide = False
-        if self.player.rect.y > Settings.HEIGHT:
-            self.player.rect = pg.Rect(100,100, Settings.WIDTH / 2, Settings.HEIGHT / 2)
-            #self.player.kill()
+        if self.player.rect.y > Settings.HEIGHT - 200:
+            self.player = Player(self)
+            self.all_sprites.add(self.player)
+            Settings.lifes -= 1
 
     def collision_test(self, tiles):
         hit_list = []
@@ -361,11 +384,13 @@ class Game:
                             self.player.shoots.append(Bullet(self.player))
                             self.player.shoot = False
                             self.player.charging = False
+                            #self.player.sound.stop()
 
                 if event.type == pg.KEYDOWN:
                     if event.key == pg.K_z:
                         if self.player.counter > 100:
                             self.player.charging = True
+                            #self.player.sound.play(pygame.mixer.Sound(path + r'\images\ROCK_X5_00183.wav'))
                         self.player.shoot = True
                         self.player.counter = 0
                     if event.key == pg.K_SPACE:
@@ -404,10 +429,12 @@ class Game:
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
         #self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
 
-        self.display.blit(Settings.text_format("0"+str(Settings.lifes), FONT, 5, WHITE), (5, 25))
-
+        self.display.blit(Settings.text_format_pygame(Settings.get_points_text(), "consolas", 10, WHITE), (3, 20))
+        self.display.blit(Settings.text_format(str(Settings.lifes), FONT, 6, WHITE), (6, 95))
+        self.display.blit(self.door.img, (self.door.rect.x-scroll[0], self.door.rect.y))
         for object in self.objects:
             if object.type != "None":
+                object.update()
                 object.rect.y += object.vertical_momentum * 1.5
                 object.vertical_momentum += 0.2
                 if object.vertical_momentum > 3:
@@ -422,17 +449,17 @@ class Game:
 
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":
-                self.display.blit(pygame.transform.flip(enemy.left_hand.img, enemy.left_hand.left, False),(enemy.left_hand.rect.x, enemy.left_hand.rect.y))
-                self.display.blit(pygame.transform.flip(enemy.enemy.img, not enemy.enemy.right, False), (enemy.enemy.rect.x, enemy.enemy.rect.y))
-                self.display.blit(pygame.transform.flip(enemy.right_hand.img, False, False),(enemy.right_hand.rect.x, enemy.right_hand.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.left_hand.img, enemy.left_hand.left, False),(enemy.left_hand.rect.x-scroll[0], enemy.left_hand.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.enemy.img, not enemy.enemy.right, False), (enemy.enemy.rect.x-scroll[0], enemy.enemy.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.right_hand.img, False, False),(enemy.right_hand.rect.x-scroll[0], enemy.right_hand.rect.y))
                 if enemy.left_hand.ring != None:
-                    self.display.blit(pygame.transform.flip(enemy.left_hand.ring.img, not enemy.enemy.right, False), (enemy.left_hand.ring.rect.x, enemy.left_hand.ring.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.left_hand.ring.img, not enemy.enemy.right, False), (enemy.left_hand.ring.rect.x-scroll[0], enemy.left_hand.ring.rect.y))
                 if enemy.right_hand.ring != None:
-                    self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x, enemy.right_hand.ring.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x-scroll[0], enemy.right_hand.ring.rect.y))
                 if enemy.ball != None:
-                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), (enemy.ball.rect.x, enemy.ball.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), (enemy.ball.rect.x-scroll[0], enemy.ball.rect.y))
                 if enemy.ball2 != None:
-                    self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x, enemy.ball2.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x-scroll[0], enemy.ball2.rect.y))
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball1.image, False, False), (enemy.ball.miniball1.rect.x, enemy.ball.miniball1.rect.y))
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball2.image, False, False), (enemy.ball.miniball2.rect.x, enemy.ball.miniball2.rect.y))
             else:
