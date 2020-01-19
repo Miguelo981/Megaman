@@ -1,4 +1,5 @@
 import pygame, sys, os
+from pygame import *
 
 def main_menu():
     menu = True
@@ -26,7 +27,7 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         print("Start")
-                        music(path+r'/music/vs_omega.mp3', True)
+                        music(path+r'/music/megaman-zero-1.mp3', True)
                         #####music(song, False)
                         #import Stage
                         #####music('music/stage_1.mp3', True)
@@ -132,8 +133,8 @@ def get_points_text():
     if len(str(points)) > 0:
         return "0000"+str(points)
 
-def load_map(path):
-    f = open(path + '.txt','r')
+def load_map(map):
+    f = open(path +map+".txt","r")
     data = f.read()
     f.close()
     data = data.split('\n')
@@ -142,14 +143,33 @@ def load_map(path):
         game_map.append(list(row))
     return game_map
 
-map = 'map'
-game_map = load_map(map)
+def change_map(map):
+    global game_map
+    game_map = load_map(map)
 
 grass_img = pygame.image.load(path+'/images/blocks/grass.png')
 dirt_img = pygame.image.load(path+'/images/blocks/dirt.png')
 metal1_img = pygame.image.load(path+'/images/blocks/m1.png')
 metal2_img = pygame.image.load(path+'/images/blocks/m2.png')
 metal3_img = pygame.image.load(path+'/images/blocks/m3.png')
+path1_img = pygame.image.load(path+'/images/blocks/p1.png')
+path2_img = pygame.image.load(path+'/images/blocks/p2.png')
+path3_img = pygame.image.load(path+'/images/blocks/p3.png')
+path4_img = pygame.image.load(path+'/images/blocks/p4.png')
+roof1_img = pygame.image.load(path+'/images/blocks/r1.png')
+roof2_img = pygame.image.load(path+'/images/blocks/r2.png')
+roof3_img = pygame.image.load(path+'/images/blocks/r3.png')
+roof4_img = pygame.image.load(path+'/images/blocks/r4.png')
+roof5_img = pygame.image.load(path+'/images/blocks/r5.png')
+roof6_img = pygame.image.load(path+'/images/blocks/r6.png')
+roof7_img = pygame.image.load(path+'/images/blocks/r7.png')
+wall1_img = pygame.image.load(path+'/images/blocks/w1.png')
+wall2_img = pygame.image.load(path+'/images/blocks/w2.png')
+wall3_img = pygame.image.load(path+'/images/blocks/w3.png')
+wall4_img = pygame.image.load(path+'/images/blocks/w4.png')
+wall5_img = pygame.image.load(path+'/images/blocks/w5.png')
+wall6_img = pygame.image.load(path+'/images/blocks/w6.png')
+wall7_img = pygame.image.load(path+'/images/blocks/w7.png')
 #background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
 true_scroll = [0,0]
 

@@ -6,6 +6,7 @@ import random
 
 from pygame.tests.base_test import pygame_quit
 
+from moviepy.editor import VideoFileClip
 from objects import *
 import Settings
 
@@ -16,6 +17,7 @@ class Game:
         # initialize game window, etc
         pg.init()
         pg.mixer.init()
+        change_map('\map')
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         #self.screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
         #self.screen.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
@@ -30,9 +32,11 @@ class Game:
         self.air_timer = 0
         self.enemies = []
         self.objects = []
+        self.doors = []
         self.counter = 0
         self.time = 0
         self.freeze_camera = False
+        self.freezeable = False
 
     def set_enemies(self):
         #self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
@@ -60,6 +64,50 @@ class Game:
             return Settings.metal2_img
         if tile == '5':
             return Settings.metal3_img
+        if tile == '6':
+            return Settings.path1_img
+        if tile == '7':
+            return Settings.path2_img
+        if tile == '8':
+            return Settings.path3_img
+        if tile == '9':
+            return Settings.path4_img
+        if tile == 'a':
+            return Settings.roof1_img
+        if tile == 'b':
+            return Settings.roof2_img
+        if tile == 'c':
+            return Settings.roof3_img
+        if tile == 'd':
+            return Settings.roof4_img
+        if tile == 'l':
+            return Settings.roof5_img
+        if tile == 'm':
+            return Settings.roof6_img
+        if tile == 'n':
+            return Settings.roof7_img
+        if tile == 'e':
+            return Settings.wall1_img
+        if tile == 'f':
+            return Settings.wall2_img
+        if tile == 'g':
+            return Settings.wall3_img
+        if tile == 'h':
+            return Settings.wall4_img
+        if tile == 'i':
+            return Settings.wall5_img
+        if tile == 'j':
+            return Settings.wall6_img
+        if tile == 'k':
+            return Settings.wall7_img
+
+    def display_video(self, name):
+        clip = VideoFileClip(path + r'/videos/'+name+'.mp4')
+        clip.preview()
+        #self.movie = pygame.movie.Movie(path + r'/videos/'+name+'.mpeg')
+        #self.display = pygame.display.set_mode(self.movie.get_size())
+        #movie_screen = pygame.Surface(self.movie.get_size()).convert()
+        #self.movie.set_display(self.display)
 
     def charge_map(self):
         global scroll
@@ -72,7 +120,7 @@ class Game:
         self.tile_rects = []
         #tile_rects = []
         y = 0
-        for layer in game_map:
+        for layer in Settings.game_map:
             x = 0
             for tile in layer:
                 if self.player.rect.x > 100 and tile != '0':
@@ -132,17 +180,18 @@ class Game:
             pass
 
         if self.collision_player_door():
-            self.door.open()
-            if self.door.count < 4:
-                self.enemies.clear()
-                self.freeze_camera = True
-                scroll[0] = 0
-                self.player.rect.x = 10
-                Settings.map = 'map2'
-                self.enemies.append(Omega(Enemy(155, 10, 100, 143, self), self.player))
+            self.enemies.clear()
+            self.freeze_camera = True
+            scroll[0] = 0
+            self.player.rect.x = 10
+            Settings.change_map('\map2')
+            self.player.able_to_move = False
+            self.display_video('warning')
+            self.player.able_to_move = True
+            self.enemies.append(Omega(Enemy(155 - scroll[0], 10, 100, 143, self), self.player))
+            self.all_sprites.add(self.enemies)
 
-        else:
-            self.door.close()
+            music(path + r'/music/vs_omega.mp3', True)
 
         if self.player.rect.x > 100:
             self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x-scroll[0], self.player.rect.y))
@@ -173,7 +222,8 @@ class Game:
 
     def new(self):
         # start a new game
-        self.door = Door(1350, 60)
+        self.doors.append(Door(1345, 60, False))
+        self.doors.append(Door(1550, 60, True))
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
         self.player = Player(self)
@@ -243,6 +293,10 @@ class Game:
             if enemy.__class__.__name__ == "Omega":
                 if self.player.rect.colliderect(enemy.invisibleWall):
                     return True
+        for door in self.doors:
+            if door.box != None:
+                if self.player.rect.colliderect(door.box):
+                    return True
         return False
 
     def collision_player_rings(self):
@@ -281,8 +335,14 @@ class Game:
         return False
 
     def collision_player_door(self):
-        if self.player.rect.colliderect(self.door):
-            return True
+        for door in self.doors:
+            if self.player.rect.colliderect(door):
+                self.freezeable = True
+                door.open()
+                if door.scene and door.count > 15:
+                    return True
+            else:
+                door.close()
         return False
 
     def update(self):
@@ -291,7 +351,7 @@ class Game:
         # Game Loop - Update
         self.all_sprites.update()
         #print(self.player.rect)
-        if self.player.rect.x > 1200:
+        if self.player.rect.x > 1200 and not self.freezeable:
             self.freeze_camera = True
         else:
             self.freeze_camera = False
@@ -431,7 +491,10 @@ class Game:
 
         self.display.blit(Settings.text_format_pygame(Settings.get_points_text(), "consolas", 10, WHITE), (3, 20))
         self.display.blit(Settings.text_format(str(Settings.lifes), FONT, 6, WHITE), (6, 95))
-        self.display.blit(self.door.img, (self.door.rect.x-scroll[0], self.door.rect.y))
+        for door in self.doors:
+            door.update()
+            self.display.blit(door.img, (door.rect.x-scroll[0], door.rect.y))
+
         for object in self.objects:
             if object.type != "None":
                 object.update()
@@ -449,17 +512,17 @@ class Game:
 
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":
-                self.display.blit(pygame.transform.flip(enemy.left_hand.img, enemy.left_hand.left, False),(enemy.left_hand.rect.x-scroll[0], enemy.left_hand.rect.y))
-                self.display.blit(pygame.transform.flip(enemy.enemy.img, not enemy.enemy.right, False), (enemy.enemy.rect.x-scroll[0], enemy.enemy.rect.y))
-                self.display.blit(pygame.transform.flip(enemy.right_hand.img, False, False),(enemy.right_hand.rect.x-scroll[0], enemy.right_hand.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.left_hand.img, enemy.left_hand.left, False),(enemy.left_hand.rect.x, enemy.left_hand.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.enemy.img, not enemy.enemy.right, False), (enemy.enemy.rect.x, enemy.enemy.rect.y))
+                self.display.blit(pygame.transform.flip(enemy.right_hand.img, False, False),(enemy.right_hand.rect.x, enemy.right_hand.rect.y))
                 if enemy.left_hand.ring != None:
-                    self.display.blit(pygame.transform.flip(enemy.left_hand.ring.img, not enemy.enemy.right, False), (enemy.left_hand.ring.rect.x-scroll[0], enemy.left_hand.ring.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.left_hand.ring.img, not enemy.enemy.right, False), (enemy.left_hand.ring.rect.x, enemy.left_hand.ring.rect.y))
                 if enemy.right_hand.ring != None:
-                    self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x-scroll[0], enemy.right_hand.ring.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x, enemy.right_hand.ring.rect.y))
                 if enemy.ball != None:
-                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), (enemy.ball.rect.x-scroll[0], enemy.ball.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.ball.image, False, False), (enemy.ball.rect.x, enemy.ball.rect.y))
                 if enemy.ball2 != None:
-                    self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x-scroll[0], enemy.ball2.rect.y))
+                    self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x, enemy.ball2.rect.y))
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball1.image, False, False), (enemy.ball.miniball1.rect.x, enemy.ball.miniball1.rect.y))
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball2.image, False, False), (enemy.ball.miniball2.rect.x, enemy.ball.miniball2.rect.y))
             else:

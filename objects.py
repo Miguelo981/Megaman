@@ -311,6 +311,7 @@ class Minion(pg.sprite.Sprite):
                 self.rect.y +=random.randint(2,4);
             if self.alive:
                 self.alive = False
+                Settings.points += 20
                 if random.randint(1,3) != 3:
                     self.game.objects.append(Drop(self))
         else:
@@ -497,6 +498,7 @@ class Omega(pg.sprite.Sprite):
         self.enemy = enemy
         self.left_hand = Left_hand(self.enemy.rect.x, self.enemy.rect.y, player)
         self.right_hand = Right_hand(self.enemy.rect.x, self.enemy.rect.y, player)
+        self.balls = []
         self.ball = None #TODO array of balls
         self.ball2 = None
         self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)
@@ -825,25 +827,34 @@ class Life_Bar(pg.sprite.Sprite):
         self.image.fill(self.color)
 
 class Door(pg.sprite.Sprite):
-    def __init__(self, x, y):
+    def __init__(self, x, y, scene):
         pg.sprite.Sprite.__init__(self)
         self.rect = pygame.Rect(x, y, 43, 88)
         self.rect.x = x
         self.rect.y = y
         self.count = 0
+        self.scene = scene
         self.sprites = load_images(path + r"\images\blocks\door")
         self.img = pg.image.load(path + r"\images\blocks\door\0.png")
+        self.box = InivisbleWall(x+10,y,22,88)
 
-    def open(self):
+    def update(self):
+        if self.count > 15:
+            self.box = None
+        else:
+            self.box = InivisbleWall(self.rect.x + 10, self.rect.y, 22, 88)
+
+    def open(self): #Hay un error al cargar las imagenes de las puertas y carga al final la numero 9 (Arreglado en el Else)
         self.img = pg.image.load(self.sprites[self.count])
         if self.count < len(self.sprites)-1:
             self.count += 1
+        else:
+            self.img = pg.image.load(self.sprites[16])
 
     def close(self):
-        if self.count > 0:
+        if self.count >= 0:
             self.img = pg.image.load(self.sprites[self.count])
             self.count -= 1
-
 
 class Platform(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, main, color):
