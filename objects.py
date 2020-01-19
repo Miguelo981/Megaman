@@ -499,27 +499,28 @@ class Omega(pg.sprite.Sprite):
         self.left_hand = Left_hand(self.enemy.rect.x, self.enemy.rect.y, player)
         self.right_hand = Right_hand(self.enemy.rect.x, self.enemy.rect.y, player)
         self.balls = []
-        self.ball = None #TODO array of balls
-        self.ball2 = None
+        #self.ball = None #TODO array of balls
+        #self.ball2 = None
         self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)
 
     def update(self):
         self.enemy.update()
         self.left_hand.update(self.enemy)
         self.right_hand.update(self.enemy)
-        if self.ball != None:
-            self.ball.update(True)
-        if self.ball2 != None:
-            self.ball2.update(True)
+        for ball in self.balls:
+            if ball.active:
+                ball.update(True)
+
         if self.enemy.life.constant_dmg == 3: #self.right_hand.rings_number < 2 or self.left_hand.rings_number < 2
             self.enemy.assault = True
             self.left_hand.attack()
             if self.enemy.life.w < 60:
                 self.right_hand.attack()
             if self.enemy.life.w < 70:
-                self.ball = Ball(self, random.randint(1,6))
-            if self.enemy.life.w < 30 and self.ball.rect.x < self.enemy.rect.x-30:
-                self.ball2 = Ball(self, self.ball.incx)
+                self.balls.append(Ball(self, random.randint(1,6)))
+            if self.enemy.life.w < 30 and self.balls[0].rect.x < self.enemy.rect.x-30:
+                self.balls.append(Ball(self, random.randint(1, 6)))
+                #self.ball2 = Ball(self, self.ball.incx)
         '''else:
             self.ball = None'''
         if self.left_hand.rings_number == 3:
@@ -684,6 +685,7 @@ class Ball(pygame.sprite.Sprite):
         self.rect.y = self.enemy.enemy.rect.y
         self.down = True
         self.incx = incx
+        self.active = True
         #pygame.mixer.Sound(path+r'\images\Bosses\Omega\ball.mp3')
         #self.miniball1 = MiniBall(self)
         #self.miniball2 = MiniBall(self)
@@ -703,14 +705,15 @@ class Ball(pygame.sprite.Sprite):
             elif self.rect.y <= 0:
                 self.down = True
             elif self.rect.x <= 0:
-                self.enemy.ball = None
+                self.active = False
+                #self.enemy.ball = None
 
         if self.rect.x < -10:
-            self.enemy.ball = None
-            self.enemy.ball2 = None
+            self.active = False
+            self.kill()
+            self.enemy.balls.remove(self)
             #self.miniball1.kill()
             #self.miniball2.kill()
-            self.kill()
 
 class MiniBall(pygame.sprite.Sprite):
     def __init__(self, ball):
