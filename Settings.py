@@ -1,10 +1,24 @@
 import pygame, sys, os
 from pygame import *
 
+def load_map(map):
+    f = open(path +map+".txt","r")
+    data = f.read()
+    f.close()
+    data = data.split('\n')
+    game_map = []
+    for row in data:
+        game_map.append(list(row))
+    return game_map
+
+def change_map(map):
+    global game_map
+    game_map = load_map(map)
+
 def main_menu():
+    global lifes, freezeable, points
     menu = True
     selected = "start"
-
     pygame.init()
     ###song = 'music/main_theme.mp3'
     #music(song, True)
@@ -26,8 +40,11 @@ def main_menu():
                     selected = "quit"
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
-                        print("Start")
                         music(path+r'/music/megaman-zero-1.mp3', True)
+                        change_map('\map')
+                        lifes = 3
+                        poins = 0
+                        freezeable = False
                         #####music(song, False)
                         #import Stage
                         #####music('music/stage_1.mp3', True)
@@ -107,8 +124,8 @@ path = os.getcwd()
 TITLE = "MEGAMAN"
 '''WIDTH = 1000
 HEIGHT = 700'''
-WIDTH = 800 #500,350,       600, 400, 800, 500
-HEIGHT = 500
+WIDTH = 1200 #500,350,       600, 400,     800, 500
+HEIGHT = 750
 FPS = 60
 
 # Player properties
@@ -122,6 +139,7 @@ name = "\Megaman"
 FPS = 60
 lifes = 3
 points = 0
+freezeable = False
 
 def get_points_text():
     if len(str(points)) > 3:
@@ -133,19 +151,6 @@ def get_points_text():
     if len(str(points)) > 0:
         return "0000"+str(points)
 
-def load_map(map):
-    f = open(path +map+".txt","r")
-    data = f.read()
-    f.close()
-    data = data.split('\n')
-    game_map = []
-    for row in data:
-        game_map.append(list(row))
-    return game_map
-
-def change_map(map):
-    global game_map
-    game_map = load_map(map)
 
 grass_img = pygame.image.load(path+'/images/blocks/grass.png')
 dirt_img = pygame.image.load(path+'/images/blocks/dirt.png')

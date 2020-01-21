@@ -21,7 +21,7 @@ class Game:
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         #self.screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
         #self.screen.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
-        self.display = pg.Surface((275, 150)) #300 200
+        self.display = pg.Surface((275, 150)) #300 200 275 150
         #self.display.fill((255,255,255))
         #self.background = pygame.image.load("images/bg.jpg")
         #self.display.blit(self.background, (0,0))
@@ -36,7 +36,6 @@ class Game:
         self.counter = 0
         self.time = 0
         self.freeze_camera = False
-        self.freezeable = False
 
     def set_enemies(self):
         #self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
@@ -103,6 +102,9 @@ class Game:
 
     def display_video(self, name):
         clip = VideoFileClip(path + r'/videos/'+name+'.mp4')
+        clip.size = (1200, 750)
+        #clipresized = clip.resize (height=500)
+        #clipresized.preview()
         clip.preview()
         #self.movie = pygame.movie.Movie(path + r'/videos/'+name+'.mpeg')
         #self.display = pygame.display.set_mode(self.movie.get_size())
@@ -111,7 +113,7 @@ class Game:
 
     def charge_map(self):
         global scroll
-        if not self.freeze_camera:
+        if not self.freeze_camera and not Settings.freezeable:
             true_scroll[0] += (self.player.rect.x - true_scroll[0] - 100)  #152
         #true_scroll[1] += (self.player.rect.y - true_scroll[1] - 106)  #106
             scroll = true_scroll.copy()
@@ -186,10 +188,11 @@ class Game:
             self.player.rect.x = 10
             Settings.change_map('\map2')
             self.player.able_to_move = False
-            self.display_video('warning')
+            self.display_video('warning2')
             self.player.able_to_move = True
             self.enemies.append(Omega(Enemy(155 - scroll[0], 10, 100, 143, self), self.player))
             self.all_sprites.add(self.enemies)
+            Settings.freezeable = True
 
             music(path + r'/music/vs_omega.mp3', True)
 
@@ -332,8 +335,8 @@ class Game:
     def collision_player_door(self):
         for door in self.doors:
             if self.player.rect.colliderect(door):
-                self.freezeable = True
                 door.open()
+                self.freeze_camera = False
                 if door.scene and door.count > 15:
                     return True
             else:
@@ -346,7 +349,7 @@ class Game:
         # Game Loop - Update
         self.all_sprites.update()
         #print(self.player.rect)
-        if self.player.rect.x > 1200 and not self.freezeable:
+        if self.player.rect.x > 1200 and not Settings.freezeable:
             self.freeze_camera = True
         else:
             self.freeze_camera = False
@@ -375,10 +378,17 @@ class Game:
                 self.player.shoots.remove(bullet)
 
         self.player.collide = False
-        if self.player.rect.y > Settings.HEIGHT - 200:
+        if self.player.rect.y > Settings.HEIGHT - 300 and self.player.alive and not Settings.lifes < 1:
+            self.player.life.h = 0
+            self.player.death()
+
+        elif Settings.lifes < 1:
+            music(path+r'/music/vs_omega.mp3', False)
+            Settings.main_menu()
+
+        if not self.player.alive:
             self.player = Player(self)
             self.all_sprites.add(self.player)
-            Settings.lifes -= 1
 
     def collision_test(self, tiles):
         hit_list = []
@@ -452,12 +462,12 @@ class Game:
                         if self.air_timer < 6:
                             self.vertical_momentum = -5
                         #self.player.jump()
-            else:
-                music(path+r'/music/vs_omega.mp3', False)
-                if event.key:
-                    import Settings
-                    Settings.main_menu()
             self.counter += self.time
+
+        #if not self.player.alive and Settings.lifes < 1:
+            #if event.key:
+            #import Settings
+         #   Settings.main_menu()
 
     def draw(self):
         # Game Loop - draw
@@ -516,7 +526,7 @@ class Game:
                 if enemy.right_hand.ring != None:
                     self.display.blit(pygame.transform.flip(enemy.right_hand.ring.img, False, False), (enemy.right_hand.ring.rect.x, enemy.right_hand.ring.rect.y))
                 for ball in enemy.balls:
-                    if ball.active != None:
+                    if ball.active:
                         self.display.blit(pygame.transform.flip(ball.image, False, False), (ball.rect.x, ball.rect.y))
                 #if enemy.ball2 != None:
                     #self.display.blit(pygame.transform.flip(enemy.ball2.image, False, False), (enemy.ball2.rect.x, enemy.ball2.rect.y))

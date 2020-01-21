@@ -177,8 +177,8 @@ class Player(pg.sprite.Sprite):
             if self.counter > 100 and self.animation_death_counter < len(self.death_sprites): #TODO ESCOGER OTRO COUNTER
                 self.img = pg.image.load(self.death_sprites[self.animation_death_counter])
                 self.animation_death_counter+=1
-            else:
-                if Settings.lifes > 1:
+            elif self.alive:
+                if Settings.lifes > 0:
                     Settings.lifes -= 1
                     pygame.mixer.Sound.play(pygame.mixer.Sound(path + r'\images\MMX09.wav'))
                 else:
@@ -303,21 +303,22 @@ class Minion(pg.sprite.Sprite):
             self.counter = 0
 
     def update(self):
-        self.rect = pygame.Rect(self.rect.x, self.rect.y, self.img.get_rect()[2], self.img.get_rect()[3])
-        self.life.set_clock(self.clock)
-        if self.life.w <= 0:
-            self.img = pg.image.load(path + r'\images\Enemies\minion\death\0.png')
-            if self.rect.y < 135:
-                self.rect.y +=random.randint(2,4);
+        if (self.rect.x-250 <= self.game.player.rect.x <= self.rect.x) or (self.rect.x+250 >= self.game.player.rect.x >= self.rect.x):
+            self.rect = pygame.Rect(self.rect.x, self.rect.y, self.img.get_rect()[2], self.img.get_rect()[3])
+            self.life.set_clock(self.clock)
+            if self.life.w <= 0:
+                self.img = pg.image.load(path + r'\images\Enemies\minion\death\0.png')
+                if self.rect.y < 135:
+                    self.rect.y +=random.randint(2,4);
+                if self.alive:
+                    self.alive = False
+                    Settings.points += 20
+                    if random.randint(1,3) != 3:
+                        self.game.objects.append(Drop(self))
+            else:
+                self.alive = True
             if self.alive:
-                self.alive = False
-                Settings.points += 20
-                if random.randint(1,3) != 3:
-                    self.game.objects.append(Drop(self))
-        else:
-            self.alive = True
-        if self.alive:
-            self.behavior()
+                self.behavior()
 
     def behavior(self):
         if self.rect.x-125 <= self.game.player.rect.x <= self.rect.x:
@@ -499,6 +500,8 @@ class Omega(pg.sprite.Sprite):
         self.left_hand = Left_hand(self.enemy.rect.x, self.enemy.rect.y, player)
         self.right_hand = Right_hand(self.enemy.rect.x, self.enemy.rect.y, player)
         self.balls = []
+        self.ball1 = True
+        self.ball2 = True
         #self.ball = None #TODO array of balls
         #self.ball2 = None
         self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)
@@ -510,17 +513,21 @@ class Omega(pg.sprite.Sprite):
         for ball in self.balls:
             if ball.active:
                 ball.update(True)
-
         if self.enemy.life.constant_dmg == 3: #self.right_hand.rings_number < 2 or self.left_hand.rings_number < 2
             self.enemy.assault = True
             self.left_hand.attack()
             if self.enemy.life.w < 60:
                 self.right_hand.attack()
-            if self.enemy.life.w < 70:
+            if self.enemy.life.w < 70 and self.ball1:
                 self.balls.append(Ball(self, random.randint(1,6)))
-            if self.enemy.life.w < 30 and self.balls[0].rect.x < self.enemy.rect.x-30:
+                self.ball1 = False
+            if self.enemy.life.w < 30 and not self.ball1 and self.ball2: #self.balls[0].rect.x < self.enemy.rect.x-30:
                 self.balls.append(Ball(self, random.randint(1, 6)))
+                self.ball2 = False
                 #self.ball2 = Ball(self, self.ball.incx)
+        else:
+            self.ball1 = True
+            self.ball2 = True
         '''else:
             self.ball = None'''
         if self.left_hand.rings_number == 3:
