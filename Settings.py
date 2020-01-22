@@ -16,7 +16,7 @@ def change_map(map):
     game_map = load_map(map)
 
 def main_menu():
-    global lifes, freezeable, points
+    global lifes, freezeable, points, selected
     menu = True
     selected = "start"
     pygame.init()
@@ -51,52 +51,52 @@ def main_menu():
                         import Game
                         Game.init_game()
                     if selected == "controls":
-                        print("Controls")
+                        screen.blit(pygame.image.load(path+ "\images\controls.png"), (0,0))
                         #stage = Stage()
                     if selected == "quit":
                         pygame.quit()
                         quit()
-            if event.type == pygame.QUIT:
-                sys.exit()
             # añadimos el evento del teclado
             #elif event.type == pygame.KEYDOWN:
                 #megaman.update(event)
-
-        # Main Menu UI
-        filename = path+'/images/Megaman-background2.png'
-        #filename = screen.fill((255,255,255))
-        image = pygame.image.load(filename)
-        screen.blit(image, (0,0))
-
-        #megaman = Player()
-        #screen.blit(megaman.img, megaman.rect)
-
-        if selected == "start":
-            text_start = text_format("START", FONT, 50, WHITE)
+        if selected != "controls":
+            load_menu()
         else:
-            text_start = text_format("START", FONT, 50, DARK)
-        if selected == "controls":
             text_controls = text_format("CONTROLS", FONT, 50, WHITE)
-        else:
-            text_controls = text_format("CONTROLS", FONT, 50, DARK)
-        if selected == "quit":
-            text_quit = text_format("QUIT", FONT, 50, WHITE)
-        else:
-            text_quit = text_format("QUIT", FONT, 50, DARK)
-
-        start_rect = text_start.get_rect()
-        controls_rect = text_controls.get_rect()
-        quit_rect = text_quit.get_rect()
-
-        # Main Menu Text
-        screen.blit(text_start, (WIDTH / 1.5 - (start_rect[2] / 2), 200))
-        screen.blit(text_controls, (WIDTH / 1.5 - (controls_rect[2] / 2), 300))
-        screen.blit(text_quit, (WIDTH / 1.5 - (quit_rect[2] / 2), 400))
 
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
         pygame.display.flip()
         pygame.display.update()
+
+def load_menu():
+    global selected
+
+    filename = path + '/images/Megaman-background3.png'
+    image = pygame.image.load(filename)
+    screen.blit(image, (0, 0))
+
+    if selected == "start":
+        text_start = text_format("START", FONT, 50, WHITE)
+    else:
+        text_start = text_format("START", FONT, 50, DARK)
+    if selected == "controls":
+        text_controls = text_format("CONTROLS", FONT, 50, WHITE)
+    else:
+        text_controls = text_format("CONTROLS", FONT, 50, DARK)
+    if selected == "quit":
+        text_quit = text_format("QUIT", FONT, 50, WHITE)
+    else:
+        text_quit = text_format("QUIT", FONT, 50, DARK)
+
+    start_rect = text_start.get_rect()
+    controls_rect = text_controls.get_rect()
+    quit_rect = text_quit.get_rect()
+
+    # Main Menu Text
+    screen.blit(text_start, (WIDTH / 1.5 - (start_rect[2] / 2), 300))
+    screen.blit(text_controls, (WIDTH / 1.5 - (controls_rect[2] / 2), 400))
+    screen.blit(text_quit, (WIDTH / 1.5 - (quit_rect[2] / 2), 500))
 
 def text_format(message, textFont, textSize, textColor):
     newFont = pygame.font.Font(textFont, textSize)
