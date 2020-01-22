@@ -5,7 +5,6 @@ from Settings import *
 vec = pg.math.Vector2
 
 #TODO SI MUERES ANTES QUE EL BOSS, CANCELAR BULLETS / ENEMY INVENCIBILITY
-#TODO PARA AHORRAR MEMORIA, SOLO MOVER ENEMIGOS QUE ESTEN 300 RECTS AL REDEDOR
 
 def load_images(folder_path):
     images = []

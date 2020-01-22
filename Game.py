@@ -10,7 +10,7 @@ from moviepy.editor import VideoFileClip
 from objects import *
 import Settings
 
-#TODO SONIDOS, SONIDO CUANDO CAIGAS
+#TODO SONIDOS, ARREGLAR COLDOWN BRAZOS, PAUSA, RESTART, CONTROLES, PANTALLA PRINCIPAL, RECORD
 
 class Game:
     def __init__(self):
