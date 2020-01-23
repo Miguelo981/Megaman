@@ -1,10 +1,8 @@
-import glob, os, random, pygame, Settings, Game
+import glob, random, Settings
 
 import pygame as pg
 from Settings import *
 vec = pg.math.Vector2
-
-#TODO SI MUERES ANTES QUE EL BOSS, CANCELAR BULLETS / ENEMY INVENCIBILITY
 
 def load_images(folder_path):
     images = []
@@ -23,7 +21,6 @@ class Player(pg.sprite.Sprite):
         self.rect.x = 50
         self.rect.y = 50
         self.vel = vec(0, 0)
-        #self.acc = vec(0, 0)
         self.right = True
         self.moving = False
         self.dashing = False
@@ -36,7 +33,6 @@ class Player(pg.sprite.Sprite):
         self.count = 0
         self.time = clock.tick()
         self.collide = False
-        #self.spawn_sprites = load_images(path + r"\images\""+name+"\MM_spawn")
         self.move_right_sprites = load_images(path+r"\images"+name+"\MM_move_r")
         self.move_left_sprites = load_images(path+r"\images"+name+"\MM_move_l")
         self.shoot_sprite = load_images(path+r"\images"+name+"\MM_shoot")
@@ -63,7 +59,6 @@ class Player(pg.sprite.Sprite):
         self.time = self.clock.tick()
         self.counter += self.time
         self.animation_counter += self.time
-        #print(self.counter)
 
     def update(self):
         self.life.set_clock_player(self.time)
@@ -104,14 +99,8 @@ class Player(pg.sprite.Sprite):
                     if not self.shoot:
                         self.image = pg.image.load(self.move_right_sprites[self.count])
                         self.img = pg.image.load(self.move_right_sprites[self.count])
-                        #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)
-                    '''elif not self.shoot:
-                        self.image = pg.image.load(self.move_left_sprites[self.count])
-                    self.img = pg.image.load(self.move_left_sprites[self.count])
-                    #self.rect = pygame.Rect(self.rect.x, self.rect.y, 28, 33)'''
                 else:
-                    self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34) #x+13
-                    #print(self.rect.x)
+                    self.rect = pygame.Rect(self.rect.x, self.rect.y, 15, 34)
                     if not self.shoot:
                         self.img = pg.image.load(path + r"\images"+name+"\MM_WS.png")
                     elif not self.shoot:
@@ -133,7 +122,6 @@ class Player(pg.sprite.Sprite):
                 self.rect.x += 3
                 self.right = True
                 self.moving = True
-            #TODO CONTROL DEL DASH
             if keys[pg.K_a] and keys[pg.K_LEFT]:
                 self.img = pg.image.load(path + r"\images"+name+"\MM_WS_dash_1.png")
                 self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
@@ -145,7 +133,6 @@ class Player(pg.sprite.Sprite):
                     self.counter = 0
 
             if keys[pg.K_a] and keys[pg.K_RIGHT]:
-                #self.image = pg.image.load(path + '\images\MM_WS_dash_1.png')
                 self.img = pg.image.load(path + r"\images"+name+"\MM_WS_dash_1.png")
                 self.rect = pygame.Rect(self.rect.x, self.rect.y, 41, 18)
                 self.moving = True
@@ -156,10 +143,7 @@ class Player(pg.sprite.Sprite):
 
             if not self.collide:
                 self.acc.x += self.vel.x * PLAYER_FRICTION
-                # equations of motion
                 self.vel += self.acc
-            #if self.rect.x > WIDTH:
-             #   self.rect.x = WIDTH
             if self.rect.x < 0:
                 self.rect.x = 0
 
@@ -501,8 +485,6 @@ class Omega(pg.sprite.Sprite):
         self.balls = []
         self.ball1 = True
         self.ball2 = True
-        #self.ball = None #TODO array of balls
-        #self.ball2 = None
         self.invisibleWall = InivisbleWall(self.enemy.rect.x+20, self.enemy.rect.y, 100, 143)
 
     def update(self):
@@ -512,7 +494,7 @@ class Omega(pg.sprite.Sprite):
         for ball in self.balls:
             if ball.active:
                 ball.update(True)
-        if self.enemy.life.constant_dmg == 3: #self.right_hand.rings_number < 2 or self.left_hand.rings_number < 2
+        if self.enemy.life.constant_dmg == 3:
             self.enemy.assault = True
             self.left_hand.attack()
             if self.enemy.life.w < 60:
@@ -520,18 +502,14 @@ class Omega(pg.sprite.Sprite):
             if self.enemy.life.w < 70 and self.ball1:
                 self.balls.append(Ball(self, random.randint(1,6)))
                 self.ball1 = False
-            if self.enemy.life.w < 30 and not self.ball1 and self.ball2: #self.balls[0].rect.x < self.enemy.rect.x-30:
+            if self.enemy.life.w < 30 and not self.ball1 and self.ball2:
                 self.balls.append(Ball(self, random.randint(1, 6)))
                 self.ball2 = False
             if self.enemy.life.w <= 0:
                 self.enemy.game.gameover = True
-             #   self.enemy.game.display.blit(Settings.text_format_pygame("GAME OVER", "consolas", 50, WHITE), (10, 30))
-                #self.ball2 = Ball(self, self.ball.incx)
         else:
             self.ball1 = True
             self.ball2 = True
-        '''else:
-            self.ball = None'''
         if self.left_hand.rings_number == 3:
             self.enemy.assault = False
 
@@ -601,7 +579,6 @@ class Left_hand(pg.sprite.Sprite):
     def attack(self):
         self.attacking = True
         self.img = self.open
-        #self.attacking = False
 
 class Right_hand(pg.sprite.Sprite):
     def __init__(self, x, y, player):
@@ -667,7 +644,6 @@ class Right_hand(pg.sprite.Sprite):
     def attack(self):
         self.attacking = True
         self.img = self.open
-        #self.attacking = False
 
 class Ring(pg.sprite.Sprite):
     def __init__(self, x, y, rect):
@@ -675,8 +651,6 @@ class Ring(pg.sprite.Sprite):
         self.img = None
         self.rect = pygame.Rect(rect)
         self.rect.x = x
-        #pygame.mixer.pre_init(44100, 16, 2, 4096)
-        #pygame.init()
         pygame.mixer.Sound.play(pygame.mixer.Sound(path + r'\images\Bosses\Omega\Rings.wav'))
         if y < 50:
             self.rect.y = y+20
@@ -696,13 +670,13 @@ class Ball(pygame.sprite.Sprite):
         self.incx = incx
         self.active = True
         #pygame.mixer.Sound(path+r'\images\Bosses\Omega\ball.mp3')
-        #self.miniball1 = MiniBall(self)
-        #self.miniball2 = MiniBall(self)
 
     def update(self, state):
         if state:
-            #self.miniball1.update()
-            #self.miniball2.update()
+            if random.randint(1,2) == 1:
+                self.image = pygame.image.load(path+r'\images\Bosses\Omega\Ball\4.png')
+            else:
+                self.image = pygame.image.load(path + r'\images\Bosses\Omega\Ball\1.png')
             if self.rect.x > -10 and self.rect.y < 110 and self.down:
                 self.rect.x -= self.incx
                 self.rect.y +=12
@@ -715,14 +689,11 @@ class Ball(pygame.sprite.Sprite):
                 self.down = True
             elif self.rect.x <= 0:
                 self.active = False
-                #self.enemy.ball = None
 
         if self.rect.x < -10:
             self.active = False
             self.kill()
             self.enemy.balls.remove(self)
-            #self.miniball1.kill()
-            #self.miniball2.kill()
 
 class MiniBall(pygame.sprite.Sprite):
     def __init__(self, ball):
@@ -745,20 +716,17 @@ class Boss(Enemy):
     def __init__(self, enemy):
         self.enemy = enemy
 
-
     def update(self):
         pass
 
 class Life_Bar(pg.sprite.Sprite):
-    def __init__(self, type, w, h, color): #max_life
+    def __init__(self, type, w, h, color):
         pg.sprite.Sprite.__init__(self)
-        self.max_life = h#max_life
-        #self.life = self.max_life
+        self.max_life = h
         self.vissible = False
         self.color = color
         self.w = w
         self.h = h
-        #self.rect = pygame.Rect(0, 0, w, h)
         self.background = pg.Surface((self.w, self.h))
         self.background.fill(DARK)
         self.image = pg.Surface((self.w, self.h)).convert()
@@ -773,13 +741,11 @@ class Life_Bar(pg.sprite.Sprite):
     def set_clock_player(self, time):
         if self.constant_dmg == 1:
             self.counter += time
-            #print("P: " + str(self.counter))
 
     def set_clock(self, clock):
         if self.constant_dmg == 3:
             self.time = clock.tick()
             self.counter += self.time
-            #print("E: "+str(self.counter))
 
     def update(self):
         pass
@@ -856,7 +822,7 @@ class Door(pg.sprite.Sprite):
         else:
             self.box = InivisbleWall(self.rect.x + 10, self.rect.y, 22, 88)
 
-    def open(self): #Hay un error al cargar las imagenes de las puertas y carga al final la numero 9 (Arreglado en el Else)
+    def open(self):
         self.img = pg.image.load(self.sprites[self.count])
         if self.count < len(self.sprites)-1:
             self.count += 1
@@ -876,7 +842,6 @@ class Platform(pg.sprite.Sprite):
         self.image = pg.Surface((self.w, self.h))
         self.image.fill(color)
         self.rect = pygame.Rect(x, y, self.w, self.h)
-        #self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
         self.main = main

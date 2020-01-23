@@ -1,21 +1,11 @@
-from encodings.punycode import selective_find
-
-import pygame as pg
-import pygame
-import random
-
-from pygame.tests.base_test import pygame_quit
-
 from moviepy.editor import VideoFileClip
 from objects import *
 import Settings
 
-#TODO SONIDOS, ARREGLAR COLDOWN BRAZOS, RECORD
 
 class Game:
     def __init__(self):
         pg.init()
-        #pg.mixer.init()
         change_map('\map')
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
         self.display = pg.Surface((275, 150))
@@ -34,19 +24,19 @@ class Game:
         self.gameover = False
 
     def set_enemies(self):
-        #self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
+        self.enemies.append(Omega(Enemy(155, 10, 100, 143, self), self.player)) #50 155 10 1250
         self.enemies.append(Minion(250, 105, 26, 39, self))
         self.enemies.append(Minion(350, 105, 26, 39, self))
         self.enemies.append(Minion(550, 105, 26, 39, self))
         self.enemies.append(Minion(650, 105, 26, 39, self))
         self.enemies.append(Minion(850, 105, 26, 39, self))
-        self.enemies.append(Minion(950, 105, 26, 39, self))
-        self.enemies.append(Minion(250, 105, 26, 39, self))
-        self.enemies.append(Minion(350, 105, 26, 39, self))
-        self.enemies.append(Minion(550, 105, 26, 39, self))
-        self.enemies.append(Minion(650, 105, 26, 39, self))
-        self.enemies.append(Minion(850, 105, 26, 39, self))
-        self.enemies.append(Minion(1050, 105, 26, 39, self))
+        self.enemies.append(Minion(900, 105, 26, 39, self))
+        self.enemies.append(Minion(450, 105, 26, 39, self))
+        self.enemies.append(Minion(750, 105, 26, 39, self))
+        self.enemies.append(Minion(500, 105, 26, 39, self))
+        self.enemies.append(Minion(600, 105, 26, 39, self))
+        self.enemies.append(Minion(1250, 105, 26, 39, self))
+        self.enemies.append(Minion(1200, 105, 26, 39, self))
 
     def get_tile_sprite(self, tile):
         if tile == '1':
@@ -121,6 +111,7 @@ class Game:
                     self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
                 x += 1
             y += 1
+
         if not self.pause:
             self.player.rect.y += self.vertical_momentum*1.5
             self.vertical_momentum += 0.2
@@ -166,7 +157,6 @@ class Game:
                 self.enemies.append(Omega(Enemy(155 - scroll[0], 10, 100, 143, self), self.player))
                 self.all_sprites.add(self.enemies)
                 Settings.freezeable = True
-
                 music(path + r'/music/vs_omega.mp3', True)
 
         if self.player.rect.x > 100:
@@ -194,10 +184,6 @@ class Game:
                     enemy.kill()
                     self.enemies.remove(enemy)
 
-
-        #self.display.blit(self.player.img, (self.player.rect.x, self.player.rect.y))
-        #self.player.rect = self.move(tile_rects)
-
     def new(self):
         # start a new game
         self.doors.append(Door(1345, 60, False))
@@ -212,7 +198,6 @@ class Game:
         self.run()
 
     def run(self):
-        # Game Loop
         self.playing = True
         while self.playing:
             self.charge_map()
@@ -225,7 +210,6 @@ class Game:
 
     def collision_bullet(self, bullet):
         for tile in self.tile_rects:
-            #print(self.player.rect)
             if bullet.rect.colliderect(tile):
                 self.tile_rects.remove(tile)
                 return True
@@ -360,7 +344,6 @@ class Game:
             self.pause = True
             self.gameover = True
             music(path+r'/music/vs_omega.mp3', False)
-            #main_menu()
 
         if not self.player.alive:
             self.player = Player(self)

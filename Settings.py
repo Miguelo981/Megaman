@@ -1,4 +1,4 @@
-import pygame, sys, os
+import pygame, os
 from pygame import *
 
 def load_map(map):
