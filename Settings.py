@@ -20,15 +20,13 @@ def main_menu():
     menu = True
     selected = "start"
     pygame.init()
-    ###song = 'music/main_theme.mp3'
-    #music(song, True)
+    pygame.mixer.stop()
     pygame.mixer.init()
-
+    music(path+r'/music/main_theme.mp3', True)
+    load_menu()
+    static_image = False
     while menu:
         for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
             if event.type == pygame.KEYDOWN:
                 if selected == "controls" and event.key == pygame.K_UP:
                     selected = "start"
@@ -40,29 +38,24 @@ def main_menu():
                     selected = "quit"
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
+                        static_image = True
                         music(path+r'/music/megaman-zero-1.mp3', True)
                         change_map('\map')
                         lifes = 3
-                        poins = 0
+                        points = 0
                         freezeable = False
-                        #####music(song, False)
-                        #import Stage
-                        #####music('music/stage_1.mp3', True)
                         import Game
                         Game.init_game()
                     if selected == "controls":
+                        static_image = True
                         screen.blit(pygame.image.load(path+ "\images\controls.png"), (0,0))
-                        #stage = Stage()
                     if selected == "quit":
                         pygame.quit()
                         quit()
-            # añadimos el evento del teclado
-            #elif event.type == pygame.KEYDOWN:
-                #megaman.update(event)
-        if selected != "controls":
-            load_menu()
-        else:
-            text_controls = text_format("CONTROLS", FONT, 50, WHITE)
+                if event.key:
+                    if not static_image:
+                        load_menu()
+                    static_image = False
 
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
@@ -72,9 +65,7 @@ def main_menu():
 def load_menu():
     global selected
 
-    filename = path + '/images/Megaman-background3.png'
-    image = pygame.image.load(filename)
-    screen.blit(image, (0, 0))
+    screen.blit(pygame.image.load(path + '/images/Megaman-background3.png'), (0, 0))
 
     if selected == "start":
         text_start = text_format("START", FONT, 50, WHITE)
@@ -93,22 +84,17 @@ def load_menu():
     controls_rect = text_controls.get_rect()
     quit_rect = text_quit.get_rect()
 
-    # Main Menu Text
     screen.blit(text_start, (WIDTH / 1.5 - (start_rect[2] / 2), 300))
     screen.blit(text_controls, (WIDTH / 1.5 - (controls_rect[2] / 2), 400))
     screen.blit(text_quit, (WIDTH / 1.5 - (quit_rect[2] / 2), 500))
 
 def text_format(message, textFont, textSize, textColor):
-    newFont = pygame.font.Font(textFont, textSize)
-    newText = newFont.render(message, 0, textColor)
-
-    return newText
+    newFont = pygame.font.Font(textFont, textSize).render(message, 0, textColor)
+    return newFont
 
 def text_format_pygame(message, textFont, textSize, textColor):
-    newFont = pygame.font.SysFont(textFont, textSize)
-    newText = newFont.render(message, 0, textColor)
-
-    return newText
+    newFont = pygame.font.SysFont(textFont, textSize).render(message, 0, textColor)
+    return newFont
 
 def music(file, state):
     if state:
@@ -119,22 +105,16 @@ def music(file, state):
     else:
         pygame.mixer.stop()
 
-# game options/settings
 path = os.getcwd()
 TITLE = "MEGAMAN"
-'''WIDTH = 1000
-HEIGHT = 700'''
-WIDTH = 1200 #500,350,       600, 400,     800, 500
+WIDTH = 1200
 HEIGHT = 750
 FPS = 60
-
-# Player properties
 PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.8
 ICON = path+"/images/megaman_exe_navi.png"
 FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
-
 name = "\Megaman"
 FPS = 60
 lifes = 3
@@ -175,10 +155,8 @@ wall4_img = pygame.image.load(path+'/images/blocks/w4.png')
 wall5_img = pygame.image.load(path+'/images/blocks/w5.png')
 wall6_img = pygame.image.load(path+'/images/blocks/w6.png')
 wall7_img = pygame.image.load(path+'/images/blocks/w7.png')
-#background_objects = [[0.25,[120,10,70,400]],[0.25,[280,30,40,400]],[0.5,[30,40,40,400]],[0.5,[130,90,100,400]],[0.5,[300,80,120,400]]]
 true_scroll = [0,0]
 
-# define colors
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 RED = (255, 0, 0)

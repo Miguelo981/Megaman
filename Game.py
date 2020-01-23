@@ -10,22 +10,16 @@ from moviepy.editor import VideoFileClip
 from objects import *
 import Settings
 
-#TODO SONIDOS, ARREGLAR COLDOWN BRAZOS, PAUSA, RESTART, CONTROLES, PANTALLA PRINCIPAL, RECORD
+#TODO SONIDOS, ARREGLAR COLDOWN BRAZOS, RECORD
 
 class Game:
     def __init__(self):
-        # initialize game window, etc
         pg.init()
-        pg.mixer.init()
+        #pg.mixer.init()
         change_map('\map')
         self.screen = pg.display.set_mode((WIDTH, HEIGHT))
-        #self.screen = pg.display.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
-        #self.screen.set_mode((WIDTH, HEIGHT), flags=pg.FULLSCREEN | pg.HWSURFACE | pg.DOUBLEBUF)
-        self.display = pg.Surface((275, 150)) #300 200 275 150
-        #self.display.fill((255,255,255))
-        #self.background = pygame.image.load("images/bg.jpg")
-        #self.display.blit(self.background, (0,0))
-        pg.display.set_caption(Settings.TITLE)
+        self.display = pg.Surface((275, 150))
+        pg.display.set_caption(TITLE)
         self.clock = pg.time.Clock()
         self.running = True
         self.vertical_momentum = 0
@@ -36,6 +30,8 @@ class Game:
         self.counter = 0
         self.time = 0
         self.freeze_camera = False
+        self.pause = False
+        self.gameover = False
 
     def set_enemies(self):
         #self.enemies.append(Omega(Enemy(1155, 10, 100, 143, self), self.player)) #50 155 10 1250
@@ -50,7 +46,7 @@ class Game:
         self.enemies.append(Minion(550, 105, 26, 39, self))
         self.enemies.append(Minion(650, 105, 26, 39, self))
         self.enemies.append(Minion(850, 105, 26, 39, self))
-        self.enemies.append(Minion(950, 105, 26, 39, self))
+        self.enemies.append(Minion(1050, 105, 26, 39, self))
 
     def get_tile_sprite(self, tile):
         if tile == '1':
@@ -103,24 +99,15 @@ class Game:
     def display_video(self, name):
         clip = VideoFileClip(path + r'/videos/'+name+'.mp4')
         clip.size = (1200, 750)
-        #clipresized = clip.resize (height=500)
-        #clipresized.preview()
         clip.preview()
-        #self.movie = pygame.movie.Movie(path + r'/videos/'+name+'.mpeg')
-        #self.display = pygame.display.set_mode(self.movie.get_size())
-        #movie_screen = pygame.Surface(self.movie.get_size()).convert()
-        #self.movie.set_display(self.display)
 
     def charge_map(self):
         global scroll
-        if not self.freeze_camera and not Settings.freezeable:
-            true_scroll[0] += (self.player.rect.x - true_scroll[0] - 100)  #152
-        #true_scroll[1] += (self.player.rect.y - true_scroll[1] - 106)  #106
+        if not self.freeze_camera and not freezeable:
+            true_scroll[0] += (self.player.rect.x - true_scroll[0] - 100)
             scroll = true_scroll.copy()
             scroll[0] = int(scroll[0])
-        #scroll[1] = int(scroll[1])
         self.tile_rects = []
-        #tile_rects = []
         y = 0
         for layer in Settings.game_map:
             x = 0
@@ -132,69 +119,55 @@ class Game:
                     scroll[0] = 0
                 if tile!= '0':
                     self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))
-                '''if tile == '1':
-                    self.display.blit(Settings.dirt_img, (x * 16, y * 16))
-                if tile == '2':
-                    self.display.blit(Settings.grass_img, (x * 16, y * 16))
-                if tile == '3':
-                    self.display.blit(Settings.metal1_img, (x * 16, y * 16))
-                if tile == '4':
-                    self.display.blit(Settings.metal2_img, (x * 16, y * 16))
-                if tile == '5':
-                    self.display.blit(Settings.metal3_img, (x * 16, y * 16))
-                if tile != '0':
-                    self.tile_rects.append(pygame.Rect(x * 16, y * 16, 16, 16))'''
-                #self.all_sprites.add(t)
-                #self.platforms.add(t)
                 x += 1
             y += 1
+        if not self.pause:
+            self.player.rect.y += self.vertical_momentum*1.5
+            self.vertical_momentum += 0.2
+            if self.vertical_momentum > 3:
+                self.vertical_momentum = 3
 
-        self.player.rect.y += self.vertical_momentum*1.5
-        self.vertical_momentum += 0.2
-        if self.vertical_momentum > 3:
-            self.vertical_momentum = 3
+            collisions = self.move(self.tile_rects)
 
-        collisions = self.move(self.tile_rects)
+            if collisions['bottom'] == True and self.player.alive:
+                self.air_timer = 0
+                self.vertical_momentum = 0
+                self.player.air = False
+                #self.player.rect.y = 0
+            else:
+                self.player.air = True
+                self.air_timer += 1
+                if not self.player.shoot:
+                    self.player.img = pg.image.load(path + r'\images\Megaman\MM_jump\1.png')
 
-        if collisions['bottom'] == True and self.player.alive:
-            self.air_timer = 0
-            self.vertical_momentum = 0
-            self.player.air = False
-            #self.player.rect.y = 0
-        else:
-            self.player.air = True
-            self.air_timer += 1
-            if not self.player.shoot:
-                self.player.img = pg.image.load(path + r'\images\Megaman\MM_jump\1.png')
+            if self.collision_player_enemy_wall():
+                self.player.rect.x = self.player.rect.x-4
 
-        if self.collision_player_enemy_wall():
-            self.player.rect.x = self.player.rect.x-4
+            if self.collision_player_enemy():
+                pass
 
-        if self.collision_player_enemy():
-            pass
+            if self.collision_player_rings():
+                pass
 
-        if self.collision_player_rings():
-            pass #TODO ADD DMG ANIMATION
+            if self.collision_player_ball():
+                pass
+            if self.collision_player_object():
+                pass
 
-        if self.collision_player_ball():
-            pass
-        if self.collision_player_object():
-            pass
+            if self.collision_player_door():
+                self.enemies.clear()
+                self.freeze_camera = True
+                scroll[0] = 0
+                self.player.rect.x = 10
+                change_map('\map2')
+                self.player.able_to_move = False
+                self.display_video('warning2')
+                self.player.able_to_move = True
+                self.enemies.append(Omega(Enemy(155 - scroll[0], 10, 100, 143, self), self.player))
+                self.all_sprites.add(self.enemies)
+                Settings.freezeable = True
 
-        if self.collision_player_door():
-            self.enemies.clear()
-            self.freeze_camera = True
-            scroll[0] = 0
-            self.player.rect.x = 10
-            Settings.change_map('\map2')
-            self.player.able_to_move = False
-            self.display_video('warning2')
-            self.player.able_to_move = True
-            self.enemies.append(Omega(Enemy(155 - scroll[0], 10, 100, 143, self), self.player))
-            self.all_sprites.add(self.enemies)
-            Settings.freezeable = True
-
-            music(path + r'/music/vs_omega.mp3', True)
+                music(path + r'/music/vs_omega.mp3', True)
 
         if self.player.rect.x > 100:
             self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x-scroll[0], self.player.rect.y))
@@ -210,6 +183,8 @@ class Game:
                 if enemy.enemy.life.w > 0:
                     self.display.blit(enemy.enemy.life.image, (enemy.enemy.rect.x + 25, enemy.enemy.rect.y - 10))
                 else:
+                    self.gameover = True
+                    self.pause = True
                     enemy.enemy.kill()
                     self.enemies.remove(enemy)
             else:
@@ -244,7 +219,8 @@ class Game:
             self.player.set_clock()
             self.clock.tick(FPS)
             self.events()
-            self.update()
+            if not self.pause:
+                self.update()
             self.draw()
 
     def collision_bullet(self, bullet):
@@ -344,11 +320,7 @@ class Game:
         return False
 
     def update(self):
-        #self.display.blit(pygame.transform.flip(self.player))
-        #self.player.spawn()
-        # Game Loop - Update
         self.all_sprites.update()
-        #print(self.player.rect)
         if self.player.rect.x > 1200 and not Settings.freezeable:
             self.freeze_camera = True
         else:
@@ -378,13 +350,17 @@ class Game:
                 self.player.shoots.remove(bullet)
 
         self.player.collide = False
-        if self.player.rect.y > Settings.HEIGHT - 300 and self.player.alive and not Settings.lifes < 1:
+        if self.player.rect.y > HEIGHT - 300 and self.player.alive and not lifes < 1:
             self.player.life.h = 0
             self.player.death()
+        if self.player.rect.y < 0:
+            self.player.rect.y +=  100
 
-        elif Settings.lifes < 1:
+        elif lifes < 1:
+            self.pause = True
+            self.gameover = True
             music(path+r'/music/vs_omega.mp3', False)
-            Settings.main_menu()
+            #main_menu()
 
         if not self.player.alive:
             self.player = Player(self)
@@ -393,7 +369,6 @@ class Game:
     def collision_test(self, tiles):
         hit_list = []
         for tile in tiles:
-            #print(self.player.rect)
             if self.player.rect.colliderect(tile):
                 hit_list.append(tile)
         return hit_list
@@ -407,13 +382,12 @@ class Game:
 
     def move(self, tiles):
         collision_types = {'top': False, 'bottom': False, 'right': False, 'left': False}
-        #self.player.rect.x += self.player.vel.x
         hit_list = self.collision_test(tiles)
         for tile in hit_list:
             if self.player.vel.x > 0:
                 self.player.rect.right = tile.left
                 collision_types['right'] = True
-            elif self.player.vel.x < 0: #movement[0] < 0
+            elif self.player.vel.x < 0:
                 self.player.rect.left = tile.right
                 collision_types['left'] = True
         self.player.rect.y += 3
@@ -428,15 +402,13 @@ class Game:
         return collision_types
 
     def events(self):
-        # Game Loop - events
         for event in pg.event.get():
-            # check for closing window
             if self.player.alive:
                 if event.type == pg.QUIT:
                     if self.playing:
                         self.playing = False
                     self.running = False
-                if event.type == pg.KEYUP:
+                if event.type == pg.KEYUP and not self.pause:
                     if event.key == pg.K_a:
                         self.player.rect = pygame.Rect(self.player.rect.x,self.player.rect.y-10,15,34)
                     if event.key == pg.K_z and self.player.shoot:
@@ -452,6 +424,13 @@ class Game:
                             #self.player.sound.stop()
 
                 if event.type == pg.KEYDOWN:
+                    if self.pause and self.gameover:
+                        if event.key:
+                            main_menu()
+                    if event.key == pg.K_ESCAPE:
+                        main_menu()
+                    if event.key == pg.K_RETURN:
+                        self.pause = not self.pause
                     if event.key == pg.K_z:
                         if self.player.counter > 100:
                             self.player.charging = True
@@ -461,42 +440,15 @@ class Game:
                     if event.key == pg.K_SPACE:
                         if self.air_timer < 6:
                             self.vertical_momentum = -5
-                        #self.player.jump()
             self.counter += self.time
 
-        #if not self.player.alive and Settings.lifes < 1:
-            #if event.key:
-            #import Settings
-         #   Settings.main_menu()
-
     def draw(self):
-        # Game Loop - draw
-        #self.screen.fill(BLACK)
-        #self.all_sprites.draw(self.screen)
-        # *after* drawing everything, flip the display
-        screen.blit(pygame.transform.scale(self.display, (Settings.WIDTH, Settings.HEIGHT)), (0, 0))
-        '''pygame.draw.rect(self.display, (7, 80, 75), pygame.Rect(Settings.WIDTH, Settings.HEIGHT, Settings.WIDTH, Settings.HEIGHT))
-        pg.draw.rect(self.display, (255, 255, 255), pg.Rect(0, 0, Settings.WIDTH, Settings.HEIGHT))
-        for background_object in background_objects:
-            obj_rect = pygame.Rect(background_object[1][0] - self.player.rect.x * background_object[0],
-                                   background_object[1][1] - self.player.rect.y * background_object[0], background_object[1][2],
-                                   background_object[1][3])
-            if background_object[0] == 0.5:
-                pygame.draw.rect(self.display, (14, 222, 150), obj_rect)
-            else:
-                pygame.draw.rect(self.display, (9, 91, 85), obj_rect)'''
-        #image = pygame.transform.scale(pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), (300, 200))
-        #pygame.draw.rect(self.display, pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png'), pg.Rect(self.player.rect.x *0.5, self.player.rect.y * 0.5, 276, 159))
-        #image = pg.image.load(path + r'\images\Bosses\Omega\vsOmega.png')
+        screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
         image = pg.image.load(path + r'\images\maps\background1.png')
-        #pillar = pg.image.load(path + r'\images\maps\pillars.png')
-
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
-        #self.display.blit(pillar, pg.Rect(-self.player.rect.x * 0.05, (self.player.rect.y * 0.1)-11, 276, 159))
+        self.display.blit(text_format_pygame(get_points_text(), "consolas", 12, WHITE), (3, 20))
+        self.display.blit(text_format_pygame(str(lifes), "consolas", 10, WHITE), (5, 95))
 
-        self.display.blit(Settings.text_format_pygame(Settings.get_points_text(), "consolas", 12, WHITE), (3, 20))
-        self.display.blit(Settings.text_format_pygame(str(Settings.lifes), "consolas", 10, WHITE), (5, 95))
-        #self.display.blit(Settings.text_format(str(Settings.lifes), FONT, 6, WHITE), (6, 95))
         for door in self.doors:
             door.update()
             self.display.blit(door.img, (door.rect.x-scroll[0], door.rect.y))
@@ -534,25 +486,15 @@ class Game:
                     #self.display.blit(pygame.transform.flip(enemy.ball.miniball2.image, False, False), (enemy.ball.miniball2.rect.x, enemy.ball.miniball2.rect.y))
             else:
                 self.display.blit(pygame.transform.flip(enemy.img, not enemy.right, False),(enemy.rect.x-scroll[0], enemy.rect.y))
-
-
-        #pg.image.load('images/bg.jpg')
-        #screen.blit(self.player.image, (WIDTH/2,HEIGHT/2))
-        #self.display.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
+        if self.pause and not self.gameover:
+            self.display.blit(text_format_pygame("PAUSE", "consolas", 75, WHITE), (40, 50))
+        if self.gameover:
+            self.display.blit(text_format_pygame("GAME OVER", "consolas", 50, WHITE), (20, 35))
+            self.display.blit(text_format_pygame("PRESS ANY KEY TO RESTART", "consolas", 15, WHITE), (40, 80))
         pg.display.flip()
-
-    def show_start_screen(self):
-        # game splash/start screen
-        pass
-
-    def show_go_screen(self):
-        # game over/continue
-        pass
 
 def init_game():
     g = Game()
-    g.show_start_screen()
     while g.running:
         g.new()
-        g.show_go_screen()
     pygame.quit()

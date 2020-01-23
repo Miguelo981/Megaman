@@ -523,6 +523,9 @@ class Omega(pg.sprite.Sprite):
             if self.enemy.life.w < 30 and not self.ball1 and self.ball2: #self.balls[0].rect.x < self.enemy.rect.x-30:
                 self.balls.append(Ball(self, random.randint(1, 6)))
                 self.ball2 = False
+            if self.enemy.life.w <= 0:
+                self.enemy.game.gameover = True
+             #   self.enemy.game.display.blit(Settings.text_format_pygame("GAME OVER", "consolas", 50, WHITE), (10, 30))
                 #self.ball2 = Ball(self, self.ball.incx)
         else:
             self.ball1 = True
