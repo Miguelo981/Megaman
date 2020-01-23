@@ -24,7 +24,7 @@ class Game:
         self.gameover = False
 
     def set_enemies(self):
-        self.enemies.append(Omega(Enemy(155, 10, 100, 143, self), self.player)) #50 155 10 1250
+        #self.enemies.append(Omega(Enemy(155, 10, 100, 143, self), self.player)) #50 155 10 1250
         self.enemies.append(Minion(250, 105, 26, 39, self))
         self.enemies.append(Minion(350, 105, 26, 39, self))
         self.enemies.append(Minion(550, 105, 26, 39, self))
