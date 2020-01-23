@@ -93,7 +93,7 @@ class Game:
 
     def charge_map(self):
         global scroll
-        if not self.freeze_camera and not freezeable:
+        if not self.freeze_camera and not Settings.freezeable:
             true_scroll[0] += (self.player.rect.x - true_scroll[0] - 100)
             scroll = true_scroll.copy()
             scroll[0] = int(scroll[0])
@@ -185,7 +185,7 @@ class Game:
 
     def new(self):
         # start a new game
-        self.doors.append(Door(1345, 60, False))
+        self.doors.append(Door(1345, 60, True))
         self.doors.append(Door(1550, 60, True))
         self.all_sprites = pg.sprite.Group()
         self.platforms = pg.sprite.Group()
@@ -296,6 +296,7 @@ class Game:
             if self.player.rect.colliderect(door):
                 door.open()
                 self.freeze_camera = False
+                Settings.freezeable = True
                 if door.scene and door.count > 15:
                     return True
             else:
@@ -333,13 +334,13 @@ class Game:
                 self.player.shoots.remove(bullet)
 
         self.player.collide = False
-        if self.player.rect.y > HEIGHT - 300 and self.player.alive and not lifes < 1:
+        if self.player.rect.y > HEIGHT - 300 and self.player.alive and not Settings.lifes < 1:
             self.player.life.h = 0
             self.player.death()
         if self.player.rect.y < 0:
             self.player.rect.y +=  100
 
-        elif lifes < 1:
+        elif Settings.lifes < 1:
             self.pause = True
             self.gameover = True
             music(path+r'/music/vs_omega.mp3', False)
@@ -429,7 +430,7 @@ class Game:
         image = pg.image.load(path + r'\images\maps\background1.png')
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
         self.display.blit(text_format_pygame(get_points_text(), "consolas", 12, WHITE), (3, 20))
-        self.display.blit(text_format_pygame(str(lifes), "consolas", 10, WHITE), (5, 95))
+        self.display.blit(text_format_pygame(str(Settings.lifes), "consolas", 10, WHITE), (5, 95))
 
         for door in self.doors:
             door.update()
