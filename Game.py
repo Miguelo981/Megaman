@@ -117,7 +117,6 @@ class Game:
             self.vertical_momentum += 0.2
             if self.vertical_momentum > 3:
                 self.vertical_momentum = 3
-
             collisions = self.move(self.tile_rects)
 
             if collisions['bottom'] == True and self.player.alive:
