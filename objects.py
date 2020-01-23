@@ -168,8 +168,6 @@ class Player(pg.sprite.Sprite):
                     self.game.playing = False
                 self.alive = False
 
-
-
 class Bullet(pg.sprite.Sprite):
     def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
@@ -274,7 +272,6 @@ class Minion(pg.sprite.Sprite):
         self.down = False
         self.clock = self.game.clock
         self.dmg_coldown = 100
-        self.assault = False
         self.alive = True
         self.move_sprites = load_images(path + r"\images\Enemies\minion\movement")
 
@@ -319,7 +316,7 @@ class Minion(pg.sprite.Sprite):
                         self.animation_counter += 1
                     else:
                         self.animation_counter = 0
-                    self.counter = 0
+                    self.counter = 0.5
                 if self.right and self.rect.x <= (self.x+50):
                     self.rect.x += 2
                 elif not self.right and self.rect.x >= (self.x-50):
@@ -510,7 +507,9 @@ class Omega(pg.sprite.Sprite):
         else:
             self.ball1 = True
             self.ball2 = True
-        if self.left_hand.rings_number == 3:
+        print(self.left_hand.rings_number)
+        print(self.right_hand.rings_number)
+        if self.left_hand.rings_number == 3 or self.right_hand.rings_number == 3:
             self.enemy.assault = False
 
 class Left_hand(pg.sprite.Sprite):

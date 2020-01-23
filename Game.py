@@ -278,7 +278,7 @@ class Game:
         for enemy in self.enemies:
             if enemy.__class__.__name__ == "Omega":
                 for ball in enemy.balls:
-                    if ball != None and self.player.rect.colliderect(ball):
+                    if ball != None and ball.active and self.player.rect.colliderect(ball):
                         self.player.life.quit_life(5)
                         return True
         return False
@@ -338,14 +338,14 @@ class Game:
             self.player.life.h = 0
             self.player.death()
         if self.player.rect.y < 0:
-            self.player.rect.y +=  100
+            self.player.rect.y += 100
 
-        elif Settings.lifes < 1:
+        if Settings.lifes < 1:
             self.pause = True
             self.gameover = True
             music(path+r'/music/vs_omega.mp3', False)
 
-        if not self.player.alive:
+        elif not self.player.alive:
             self.player = Player(self)
             self.all_sprites.add(self.player)
 
@@ -407,9 +407,6 @@ class Game:
                             #self.player.sound.stop()
 
                 if event.type == pg.KEYDOWN:
-                    if self.pause and self.gameover:
-                        if event.key:
-                            main_menu()
                     if event.key == pg.K_ESCAPE:
                         main_menu()
                     if event.key == pg.K_RETURN:
@@ -423,6 +420,9 @@ class Game:
                     if event.key == pg.K_SPACE:
                         if self.air_timer < 6:
                             self.vertical_momentum = -5
+            elif self.pause and self.gameover:
+                if event.key:
+                    main_menu()
             self.counter += self.time
 
     def draw(self):
