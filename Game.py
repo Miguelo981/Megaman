@@ -183,6 +183,8 @@ class Game:
                     enemy.kill()
                     self.enemies.remove(enemy)
 
+#Funcion que se ejecutara unicamente al crear el objeto Game
+
     def new(self):
         # start a new game
         self.doors.append(Door(1345, 60, True))
@@ -206,6 +208,8 @@ class Game:
             if not self.pause:
                 self.update()
             self.draw()
+
+#Funciones para el control de colisiones
 
     def collision_bullet(self, bullet):
         for tile in self.tile_rects:
@@ -302,6 +306,8 @@ class Game:
             else:
                 door.close()
         return False
+
+#Funcion para ejecutar el update de los objetos pygame.sprite.Sprite
 
     def update(self):
         self.all_sprites.update()
@@ -424,6 +430,8 @@ class Game:
                 if event.key:
                     main_menu()
             self.counter += self.time
+
+#Funcion para imprimir/dibujar los sprites por pantalla
 
     def draw(self):
         screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))

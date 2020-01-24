@@ -1,6 +1,8 @@
 import pygame, os
 from pygame import *
 
+#Modulo para la preparacion de variables generales del juego
+
 def load_map(map):
     f = open(path +map+".txt","r")
     data = f.read()
@@ -15,6 +17,7 @@ def change_map(map):
     global game_map
     game_map = load_map(map)
 
+#Menu principal del juego para acceder a las diferentes opciones
 def main_menu():
     global lifes, freezeable, points, selected
     menu = True

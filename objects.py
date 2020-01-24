@@ -11,6 +11,7 @@ def load_images(folder_path):
         images.append(folder_path + '/' + files)
     return images
 
+#Objeto jugador y sus funciones
 class Player(pg.sprite.Sprite):
     def __init__(self, game):
         pg.sprite.Sprite.__init__(self)
@@ -168,6 +169,7 @@ class Player(pg.sprite.Sprite):
                     self.game.playing = False
                 self.alive = False
 
+#Objeto bala
 class Bullet(pg.sprite.Sprite):
     def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
@@ -209,6 +211,7 @@ class Bullet(pg.sprite.Sprite):
         if self.count > 4:
             self.count = 0
 
+#Objeto carga del buster
 class Charge(pg.sprite.Sprite):
     def __init__(self, player):
         pg.sprite.Sprite.__init__(self)
@@ -248,6 +251,7 @@ class Charge(pg.sprite.Sprite):
             self.counter += 1
             self.animation_counter = 0
 
+#Objeto minion, enemigo normal
 class Minion(pg.sprite.Sprite):
     def __init__(self, x, y, w, h, game):
         pg.sprite.Sprite.__init__(self)
@@ -372,6 +376,7 @@ class Bullet2(pg.sprite.Sprite):
         if self.count > 4:
             self.count = 0
 
+#Objeto del drop de enemigos
 class Drop(pg.sprite.Sprite):
     def __init__(self, enemy):
         pg.sprite.Sprite.__init__(self)
@@ -473,6 +478,7 @@ class Enemy(pg.sprite.Sprite):
     def behavior(self):
         pass
 
+#Objeto Omega, boss principal del juego
 class Omega(pg.sprite.Sprite):
     def __init__(self, enemy, player):
         pg.sprite.Sprite.__init__(self)
@@ -509,6 +515,7 @@ class Omega(pg.sprite.Sprite):
             self.ball2 = True
         if self.left_hand.rings_number == 3 or self.right_hand.rings_number == 3:
             self.enemy.assault = False
+
 
 class Left_hand(pg.sprite.Sprite):
     def __init__(self, x, y, player):
@@ -642,6 +649,7 @@ class Right_hand(pg.sprite.Sprite):
         self.attacking = True
         self.img = self.open
 
+#Objeto anillo dispadarado por las manos de Omega
 class Ring(pg.sprite.Sprite):
     def __init__(self, x, y, rect):
         pg.sprite.Sprite.__init__(self)
@@ -716,6 +724,7 @@ class Boss(Enemy):
     def update(self):
         pass
 
+#Objeto de las barras de vida de los enemigos, jugador y Omega
 class Life_Bar(pg.sprite.Sprite):
     def __init__(self, type, w, h, color):
         pg.sprite.Sprite.__init__(self)
@@ -801,6 +810,7 @@ class Life_Bar(pg.sprite.Sprite):
         self.image = pg.Surface((self.w, self.h))
         self.image.fill(self.color)
 
+#Objeto de la puerta
 class Door(pg.sprite.Sprite):
     def __init__(self, x, y, scene):
         pg.sprite.Sprite.__init__(self)
