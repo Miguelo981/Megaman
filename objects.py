@@ -507,8 +507,6 @@ class Omega(pg.sprite.Sprite):
         else:
             self.ball1 = True
             self.ball2 = True
-        print(self.left_hand.rings_number)
-        print(self.right_hand.rings_number)
         if self.left_hand.rings_number == 3 or self.right_hand.rings_number == 3:
             self.enemy.assault = False
 

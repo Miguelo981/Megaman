@@ -56,7 +56,6 @@ def main_menu():
                     if not static_image:
                         load_menu()
                     static_image = False
-
         clock.tick(FPS)
         pygame.display.set_caption("MEGAMAN EXE")
         pygame.display.flip()

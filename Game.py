@@ -420,7 +420,7 @@ class Game:
                     if event.key == pg.K_SPACE:
                         if self.air_timer < 6:
                             self.vertical_momentum = -5
-            elif self.pause and self.gameover:
+            if self.pause and self.gameover:
                 if event.key:
                     main_menu()
             self.counter += self.time
