@@ -2,9 +2,11 @@ import pygame, os
 from pygame import *
 
 #Modulo para la preparacion de variables generales del juego
+from conf import ASSETS_PATH
+
 
 def load_map(map):
-    f = open(path +map+".txt","r")
+    f = open(os.path.join(ASSETS_PATH, "maps/"+map+".txt"), "r")
     data = f.read()
     f.close()
     data = data.split('\n')
@@ -25,7 +27,7 @@ def main_menu():
     pygame.init()
     pygame.mixer.stop()
     pygame.mixer.init()
-    music(path+r'/music/main_theme.mp3', True)
+    music(os.path.join(ASSETS_PATH, 'music/main_theme.mp3'), True)
     load_menu()
     static_image = False
     while menu:
@@ -42,7 +44,7 @@ def main_menu():
                 if event.key == pygame.K_RETURN:
                     if selected == "start":
                         static_image = True
-                        music(path+r'/music/megaman-zero-1.mp3', True)
+                        music(os.path.join(ASSETS_PATH, 'music/megaman-zero-1.mp3'), True)
                         change_map('\map')
                         lifes = 3
                         points = 0
@@ -51,7 +53,7 @@ def main_menu():
                         Game.init_game()
                     if selected == "controls":
                         static_image = True
-                        screen.blit(pygame.image.load(path+ "\images\controls.png"), (0,0))
+                        screen.blit(pygame.image.load(os.path.join(ASSETS_PATH, "images/controls.png")), (0,0))
                     if selected == "quit":
                         pygame.quit()
                         quit()
@@ -67,7 +69,7 @@ def main_menu():
 def load_menu():
     global selected
 
-    screen.blit(pygame.image.load(path + '/images/Megaman-background3.png'), (0, 0))
+    screen.blit(pygame.image.load(os.path.join(ASSETS_PATH, 'images/Megaman-background3.png')), (0, 0))
 
     if selected == "start":
         text_start = text_format("START", FONT, 50, WHITE)
@@ -115,9 +117,9 @@ FPS = 60
 PLAYER_ACC = 0.5
 PLAYER_FRICTION = -0.12
 PLAYER_GRAV = 0.8
-ICON = path+"/images/megaman_exe_navi.png"
-FONT = path+"/fonts/Mega-Man-Battle-Network.ttf"
-name = "\Megaman"
+ICON = os.path.join(ASSETS_PATH, "images/megaman_exe_navi.png")
+FONT = os.path.join(ASSETS_PATH, "fonts/Mega-Man-Battle-Network.ttf")
+name = "Megaman"
 FPS = 60
 lifes = 3
 points = 0
@@ -134,29 +136,29 @@ def get_points_text():
         return "0000"+str(points)
 
 
-grass_img = pygame.image.load(path+'/images/blocks/grass.png')
-dirt_img = pygame.image.load(path+'/images/blocks/dirt.png')
-metal1_img = pygame.image.load(path+'/images/blocks/m1.png')
-metal2_img = pygame.image.load(path+'/images/blocks/m2.png')
-metal3_img = pygame.image.load(path+'/images/blocks/m3.png')
-path1_img = pygame.image.load(path+'/images/blocks/p1.png')
-path2_img = pygame.image.load(path+'/images/blocks/p2.png')
-path3_img = pygame.image.load(path+'/images/blocks/p3.png')
-path4_img = pygame.image.load(path+'/images/blocks/p4.png')
-roof1_img = pygame.image.load(path+'/images/blocks/r1.png')
-roof2_img = pygame.image.load(path+'/images/blocks/r2.png')
-roof3_img = pygame.image.load(path+'/images/blocks/r3.png')
-roof4_img = pygame.image.load(path+'/images/blocks/r4.png')
-roof5_img = pygame.image.load(path+'/images/blocks/r5.png')
-roof6_img = pygame.image.load(path+'/images/blocks/r6.png')
-roof7_img = pygame.image.load(path+'/images/blocks/r7.png')
-wall1_img = pygame.image.load(path+'/images/blocks/w1.png')
-wall2_img = pygame.image.load(path+'/images/blocks/w2.png')
-wall3_img = pygame.image.load(path+'/images/blocks/w3.png')
-wall4_img = pygame.image.load(path+'/images/blocks/w4.png')
-wall5_img = pygame.image.load(path+'/images/blocks/w5.png')
-wall6_img = pygame.image.load(path+'/images/blocks/w6.png')
-wall7_img = pygame.image.load(path+'/images/blocks/w7.png')
+grass_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/grass.png'))
+dirt_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/dirt.png'))
+metal1_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/m1.png'))
+metal2_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/m2.png'))
+metal3_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/m3.png'))
+path1_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/p1.png'))
+path2_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/p2.png'))
+path3_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/p3.png'))
+path4_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/p4.png'))
+roof1_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r1.png'))
+roof2_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r2.png'))
+roof3_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r3.png'))
+roof4_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r4.png'))
+roof5_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r5.png'))
+roof6_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r6.png'))
+roof7_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/r7.png'))
+wall1_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w1.png'))
+wall2_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w2.png'))
+wall3_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w3.png'))
+wall4_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w4.png'))
+wall5_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w5.png'))
+wall6_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w6.png'))
+wall7_img = pygame.image.load(os.path.join(ASSETS_PATH, 'images/blocks/w7.png'))
 true_scroll = [0,0]
 
 WHITE = (255, 255, 255)

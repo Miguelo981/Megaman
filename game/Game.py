@@ -1,5 +1,9 @@
 from moviepy.editor import VideoFileClip
-from objects import *
+
+from game.entities.bosses import Omega, Enemy
+from game.entities.enemies import Minion
+from game.entities.player import Player
+from game.entities.objects import *
 import Settings
 
 
@@ -87,7 +91,7 @@ class Game:
             return Settings.wall7_img
 
     def display_video(self, name):
-        clip = VideoFileClip(path + r'/videos/'+name+'.mp4')
+        clip = VideoFileClip(os.path.join(ASSETS_PATH, 'videos/'+name+'.mp4'))
         clip.size = (1200, 750)
         clip.preview()
 
@@ -128,7 +132,7 @@ class Game:
                 self.player.air = True
                 self.air_timer += 1
                 if not self.player.shoot:
-                    self.player.img = pg.image.load(path + r'\images\Megaman\MM_jump\1.png')
+                    self.player.img = pg.image.load(os.path.join(ASSETS_PATH, 'images/Megaman/MM_jump/1.png'))
 
             if self.collision_player_enemy_wall():
                 self.player.rect.x = self.player.rect.x-4
@@ -149,20 +153,20 @@ class Game:
                 self.freeze_camera = True
                 scroll[0] = 0
                 self.player.rect.x = 10
-                change_map('\map2')
+                change_map('boss')
                 self.player.able_to_move = False
                 self.display_video('warning2')
                 self.player.able_to_move = True
                 self.enemies.append(Omega(Enemy(155 - scroll[0], 10, 100, 143, self), self.player))
                 self.all_sprites.add(self.enemies)
                 Settings.freezeable = True
-                music(path + r'/music/vs_omega.mp3', True)
+                music(os.path.join(ASSETS_PATH, 'music/vs_omega.mp3'), True)
 
         if self.player.rect.x > 100:
             self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x-scroll[0], self.player.rect.y))
         else:
             self.display.blit(pygame.transform.flip(self.player.img, not self.player.right, False), (self.player.rect.x, self.player.rect.y))
-        self.display.blit(pygame.image.load(path+'\images\MM_WS_life_bar.png'), (0,34))
+        self.display.blit(pygame.image.load(os.path.join(ASSETS_PATH, 'images/MM_WS_life_bar.png')), (0,34))
         self.display.blit(self.player.life.background, (self.player.life.rect.x, self.player.life.rect.y))
         self.display.blit(self.player.life.image, (self.player.life.rect.x, self.player.life.rect.y))
         if self.player.charging:
@@ -225,15 +229,19 @@ class Game:
                     if bullet.special:
                         enemy.enemy.life.quit_enemy_life(9)
                         enemy.enemy.life.constant_dmg = 3
+                        Settings.points += 5
                     else:
                         enemy.enemy.life.quit_enemy_life(3)
+                        Settings.points += 5
                     return True
             elif bullet.rect.colliderect(enemy):
                     if bullet.special:
                         enemy.life.quit_minion_life(9)
                         enemy.life.constant_dmg = 3
+                        Settings.points += 5
                     else:
                         enemy.life.quit_minion_life(3)
+                        Settings.points += 5
                     return True
         return False
 
@@ -349,7 +357,7 @@ class Game:
         if Settings.lifes < 1:
             self.pause = True
             self.gameover = True
-            music(path+r'/music/vs_omega.mp3', False)
+            music(os.path.join(ASSETS_PATH, '/music/vs_omega.mp3'), False)
 
         elif not self.player.alive:
             self.player = Player(self)
@@ -435,7 +443,7 @@ class Game:
 
     def draw(self):
         screen.blit(pygame.transform.scale(self.display, (WIDTH, HEIGHT)), (0, 0))
-        image = pg.image.load(path + r'\images\maps\background1.png')
+        image = pg.image.load(os.path.join(ASSETS_PATH, 'images/maps/background1.png'))
         self.display.blit(image, pg.Rect(-self.player.rect.x * 0.4, (self.player.rect.y * 0.1)-11, 276, 159))
         self.display.blit(text_format_pygame(get_points_text(), "consolas", 12, WHITE), (3, 20))
         self.display.blit(text_format_pygame(str(Settings.lifes), "consolas", 10, WHITE), (5, 95))
